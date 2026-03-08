@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Nebula Orbs: Multiple spherical volumes with distinct chromatic media
+  floating in a thin ambient fog. A central bright light illuminates
+  the volumes from above, showcasing color-dependent scattering and
+  absorption.
+-->
+<scene version="0.5.0">
+	<integrator type="volpath">
+		<integer name="maxDepth" value="-1"/>
+		<integer name="version" value="6"/>
+	</integrator>
+
+	<!-- Thin ambient fog -->
+	<medium type="homogeneous" id="ambient_fog">
+		<rgb name="sigmaA" value="0.01 0.01 0.02"/>
+		<rgb name="sigmaS" value="0.05 0.05 0.08"/>
+		<float name="scale" value="1.0"/>
+	</medium>
+
+	<!-- Red/orange nebula: absorbs blue, scatters red (albedo ~0.75) -->
+	<medium type="homogeneous" id="nebula_red">
+		<rgb name="sigmaA" value="0.5 0.8 1.5"/>
+		<rgb name="sigmaS" value="1.5 0.8 0.2"/>
+		<float name="scale" value="1.0"/>
+		<phase type="hg">
+			<float name="g" value="0.7"/>
+		</phase>
+	</medium>
+
+	<!-- Blue/cyan nebula: absorbs red, scatters blue (albedo ~0.7) -->
+	<medium type="homogeneous" id="nebula_blue">
+		<rgb name="sigmaA" value="1.2 0.4 0.2"/>
+		<rgb name="sigmaS" value="0.3 1.0 1.8"/>
+		<float name="scale" value="1.0"/>
+		<phase type="hg">
+			<float name="g" value="-0.3"/>
+		</phase>
+	</medium>
+
+	<!-- Green nebula: absorbs R and B, scatters green (albedo ~0.6) -->
+	<medium type="homogeneous" id="nebula_green">
+		<rgb name="sigmaA" value="0.8 0.2 0.6"/>
+		<rgb name="sigmaS" value="0.5 1.5 0.4"/>
+		<float name="scale" value="1.0"/>
+		<phase type="hg">
+			<float name="g" value="0.0"/>
+		</phase>
+	</medium>
+
+	<!-- Purple haze: moderate scattering (albedo ~0.65) -->
+	<medium type="homogeneous" id="nebula_purple">
+		<rgb name="sigmaA" value="0.5 1.0 0.4"/>
+		<rgb name="sigmaS" value="1.2 0.5 1.5"/>
+		<float name="scale" value="1.0"/>
+		<phase type="hg">
+			<float name="g" value="0.5"/>
+		</phase>
+	</medium>
+
+	<sensor type="perspective">
+		<string name="fovAxis" value="x"/>
+		<float name="fov" value="55"/>
+		<transform name="toWorld">
+			<lookAt target="0, 0.2, 0" origin="0, 0.5, -6" up="0, 1, 0"/>
+		</transform>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="512"/>
+		</sampler>
+
+		<film type="hdrfilm" id="film">
+			<integer name="width" value="768"/>
+			<integer name="height" value="512"/>
+			<string name="pixelFormat" value="rgb"/>
+			<rfilter type="gaussian"/>
+		</film>
+
+		<ref id="ambient_fog"/>
+	</sensor>
+
+	<!-- Bright top light -->
+	<shape type="sphere">
+		<point name="center" x="0" y="3.5" z="0"/>
+		<float name="radius" value="0.5"/>
+		<emitter type="area">
+			<spectrum name="radiance" value="80"/>
+		</emitter>
+		<ref name="exterior" id="ambient_fog"/>
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0 0 0"/>
+		</bsdf>
+	</shape>
+
+	<!-- Warm side light -->
+	<shape type="sphere">
+		<point name="center" x="-3" y="1" z="-2"/>
+		<float name="radius" value="0.3"/>
+		<emitter type="area">
+			<rgb name="radiance" value="60 35 10"/>
+		</emitter>
+		<ref name="exterior" id="ambient_fog"/>
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0 0 0"/>
+		</bsdf>
+	</shape>
+
+	<!-- Red nebula orb (left) -->
+	<shape type="sphere">
+		<point name="center" x="-1.3" y="0" z="0"/>
+		<float name="radius" value="0.8"/>
+		<ref name="interior" id="nebula_red"/>
+		<ref name="exterior" id="ambient_fog"/>
+	</shape>
+
+	<!-- Blue nebula orb (right) -->
+	<shape type="sphere">
+		<point name="center" x="1.3" y="0.2" z="0.3"/>
+		<float name="radius" value="0.7"/>
+		<ref name="interior" id="nebula_blue"/>
+		<ref name="exterior" id="ambient_fog"/>
+	</shape>
+
+	<!-- Green nebula orb (center-back) -->
+	<shape type="sphere">
+		<point name="center" x="0" y="-0.3" z="1.2"/>
+		<float name="radius" value="0.65"/>
+		<ref name="interior" id="nebula_green"/>
+		<ref name="exterior" id="ambient_fog"/>
+	</shape>
+
+	<!-- Purple nebula orb (center-front, partially overlapping) -->
+	<shape type="sphere">
+		<point name="center" x="-0.2" y="0.6" z="-0.5"/>
+		<float name="radius" value="0.55"/>
+		<ref name="interior" id="nebula_purple"/>
+		<ref name="exterior" id="ambient_fog"/>
+	</shape>
+
+	<!-- Ground plane (diffuse) -->
+	<shape type="sphere">
+		<point name="center" x="0" y="-102" z="0"/>
+		<float name="radius" value="100"/>
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.15 0.12 0.18"/>
+		</bsdf>
+		<ref name="exterior" id="ambient_fog"/>
+	</shape>
+
+	<!-- Enclosing sphere to bound the fog (index-matching, no material) -->
+	<shape type="sphere">
+		<point name="center" x="0" y="0" z="0"/>
+		<float name="radius" value="20"/>
+		<ref name="interior" id="ambient_fog"/>
+	</shape>
+</scene>

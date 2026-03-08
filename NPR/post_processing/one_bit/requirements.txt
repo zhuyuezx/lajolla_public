@@ -1,0 +1,4 @@
+# NPR Post-Processing dependencies
+numpy>=1.20
+opencv-python>=4.5
+Pillow>=9.0

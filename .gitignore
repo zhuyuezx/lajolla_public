@@ -46,3 +46,12 @@ build/
 
 #vscode related
 .vscode
+
+# every png or exr or jpg file in project
+**/*.png
+**/*.exr
+**/*.jpg
+**/*.pdf
+**/*.md
+**/*.gif
+**/*.mov

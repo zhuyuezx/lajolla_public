@@ -1,0 +1,6 @@
+Usage of LLM:
+1. Used NotebookLM for analyzing La Jolla codebase and question answering ideas.
+2. Working inside Visual Studio Code, so used github copilot for code suggestions.
+3. Used Claude 4.5 Sonnet inside copilot agent for debugging disney_glass.inl and disney_bsdf.inl files. (Although turned out that the debugging is not very successful)
+4. Used github copilot for question writing completions. (Not for complete generation, mainly for finishing the rest of the sentence when main ideas are provided)
+5. Used Claude 4.5 Sonnet for constructing the XML structure for custom playground scenes, and then manually edited the content for fine-tuning.

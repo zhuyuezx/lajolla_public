@@ -2,7 +2,7 @@
 
 <scene version="0.5.0">
 	<integrator type="path">
-		<integer name="maxDepth" value="2"/>
+		<integer name="maxDepth" value="-1"/>
 	</integrator>
 
 	<shape type="sphere">
@@ -18,24 +18,39 @@
 			<float name="roughness" value="0.5"/>
 		</bsdf> -->
 
-<!-- 		<bsdf type="disneydiffuse">
+		<!-- <bsdf type="diffuse">
 			<rgb name="baseColor" value="0.5 0.5 0.5"/>
-			<float name="roughness" value="1.0"/>
-			<float name="subsurface" value="0.0"/>
+			<float name="roughness" value="0.5"/>
+			<float name="subsurface" value="0.5"/>
 		</bsdf> -->
 
-<!-- 		<bsdf type="disneymetal">
+		<!-- <bsdf type="disneymetal">
 			<rgb name="baseColor" value="0.5 0.5 0.5"/>
-			<float name="roughness" value="0.2"/>
+			<float name="roughness" value="0.5"/>
 			<float name="anisotropic" value="0.5"/>
+		</bsdf> -->
+
+		<!-- <bsdf type="roughplastic">
+			<rgb name="diffuseReflectance" value="0.5 0.5 0.5"/>
+			<spectrum name="specularReflectance" value="0.5"/>
+			<float name="intIOR" value="2"/>
+			<float name="alpha" value="0.005"/>
 		</bsdf> -->
 
 <!-- 		<bsdf type="disneyclearcoat">
 			<float name="clearcoatGloss" value="0.5"/>
 		</bsdf> -->
 
-<!-- 		<bsdf type="disneysheen">
+		<bsdf type="disneysheen">
 			<rgb name="baseColor" value="0.5 0.5 0.5"/>
+			<float name="sheenTint" value="0.0"/>
+		</bsdf>
+
+		<!-- <bsdf type="disneyglass">
+			<rgb name="baseColor" value="0.5 0.5 0.5"/>
+			<float name="roughness" value="0.5"/>
+			<float name="anisotropic" value="0.5"/>
+			<float name="eta" value="1.5"/>
 		</bsdf> -->
 	</shape>
 

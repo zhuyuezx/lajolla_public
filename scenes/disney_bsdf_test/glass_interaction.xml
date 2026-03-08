@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.5.0">
+	<integrator type="path">
+		<integer name="maxDepth" value="-1"/>
+	</integrator>
+
+	<!-- Camera -->
+	<sensor type="perspective" id="Camera">
+		<string name="fovAxis" value="x"/>
+		<float name="fov" value="60"/>
+		<transform name="toWorld">
+			<lookAt target="0, 0, 0.8" origin="4, 5.5, 2" up="0, 0, 1"/>
+		</transform>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="256"/>
+		</sampler>
+
+		<film type="hdrfilm" id="film">
+			<integer name="width" value="800"/>
+			<integer name="height" value="600"/>
+			<string name="pixelFormat" value="rgb"/>
+			<boolean name="banner" value="false"/>
+
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<!-- Glass Materials -->
+	<!-- Clear glass -->
+	<bsdf type="disneybsdf" id="glass_clear">
+		<rgb name="baseColor" value="1.0 1.0 1.0"/>
+		<float name="specularTransmission" value="1.0"/>
+		<float name="metallic" value="0.0"/>
+		<float name="subsurface" value="0.0"/>
+		<float name="specular" value="0.5"/>
+		<float name="roughness" value="0.0"/>
+		<float name="specularTint" value="0.0"/>
+		<float name="anisotropic" value="0.0"/>
+		<float name="sheen" value="0.0"/>
+		<float name="sheenTint" value="0.0"/>
+		<float name="clearcoat" value="0.0"/>
+		<float name="clearcoatGloss" value="1.0"/>
+		<float name="eta" value="1.5"/>
+	</bsdf>
+
+	<!-- Colored glass - amber -->
+	<bsdf type="disneybsdf" id="glass_amber">
+		<rgb name="baseColor" value="1.0 0.6 0.1"/>
+		<float name="specularTransmission" value="1.0"/>
+		<float name="metallic" value="0.0"/>
+		<float name="subsurface" value="0.0"/>
+		<float name="specular" value="0.5"/>
+		<float name="roughness" value="0.02"/>
+		<float name="specularTint" value="0.0"/>
+		<float name="anisotropic" value="0.0"/>
+		<float name="sheen" value="0.0"/>
+		<float name="sheenTint" value="0.0"/>
+		<float name="clearcoat" value="0.0"/>
+		<float name="clearcoatGloss" value="1.0"/>
+		<float name="eta" value="1.5"/>
+	</bsdf>
+
+	<!-- Colored glass - blue -->
+	<bsdf type="disneybsdf" id="glass_blue">
+		<rgb name="baseColor" value="0.2 0.5 1.0"/>
+		<float name="specularTransmission" value="1.0"/>
+		<float name="metallic" value="0.0"/>
+		<float name="subsurface" value="0.0"/>
+		<float name="specular" value="0.5"/>
+		<float name="roughness" value="0.0"/>
+		<float name="specularTint" value="0.0"/>
+		<float name="anisotropic" value="0.0"/>
+		<float name="sheen" value="0.0"/>
+		<float name="sheenTint" value="0.0"/>
+		<float name="clearcoat" value="0.0"/>
+		<float name="clearcoatGloss" value="1.0"/>
+		<float name="eta" value="1.5"/>
+	</bsdf>
+
+	<!-- Colored glass - green -->
+	<bsdf type="disneybsdf" id="glass_green">
+		<rgb name="baseColor" value="0.3 1.0 0.4"/>
+		<float name="specularTransmission" value="1.0"/>
+		<float name="metallic" value="0.0"/>
+		<float name="subsurface" value="0.0"/>
+		<float name="specular" value="0.5"/>
+		<float name="roughness" value="0.05"/>
+		<float name="specularTint" value="0.0"/>
+		<float name="anisotropic" value="0.0"/>
+		<float name="sheen" value="0.0"/>
+		<float name="sheenTint" value="0.0"/>
+		<float name="clearcoat" value="0.0"/>
+		<float name="clearcoatGloss" value="1.0"/>
+		<float name="eta" value="1.6"/>
+	</bsdf>
+
+	<!-- Rough glass -->
+	<bsdf type="disneybsdf" id="glass_frosted">
+		<rgb name="baseColor" value="0.95 0.95 1.0"/>
+		<float name="specularTransmission" value="1.0"/>
+		<float name="metallic" value="0.0"/>
+		<float name="subsurface" value="0.0"/>
+		<float name="specular" value="0.5"/>
+		<float name="roughness" value="0.15"/>
+		<float name="specularTint" value="0.0"/>
+		<float name="anisotropic" value="0.0"/>
+		<float name="sheen" value="0.0"/>
+		<float name="sheenTint" value="0.0"/>
+		<float name="clearcoat" value="0.0"/>
+		<float name="clearcoatGloss" value="1.0"/>
+		<float name="eta" value="1.5"/>
+	</bsdf>
+
+	<!-- Glass Spheres -->
+	<!-- Center large clear sphere -->
+	<shape type="sphere">
+		<point name="center" x="0" y="0" z="1.0"/>
+		<float name="radius" value="1.0"/>
+		<ref name="bsdf" id="glass_clear"/>
+	</shape>
+
+	<!-- Amber sphere - left front -->
+	<shape type="sphere">
+		<point name="center" x="-1.8" y="1.2" z="0.7"/>
+		<float name="radius" value="0.7"/>
+		<ref name="bsdf" id="glass_amber"/>
+	</shape>
+
+	<!-- Blue sphere - right front -->
+	<shape type="sphere">
+		<point name="center" x="1.5" y="1.0" z="0.6"/>
+		<float name="radius" value="0.6"/>
+		<ref name="bsdf" id="glass_blue"/>
+	</shape>
+
+	<!-- Green sphere - back left -->
+	<shape type="sphere">
+		<point name="center" x="-1.2" y="-1.5" z="0.8"/>
+		<float name="radius" value="0.8"/>
+		<ref name="bsdf" id="glass_green"/>
+	</shape>
+
+	<!-- Small frosted sphere - right back -->
+	<shape type="sphere">
+		<point name="center" x="1.8" y="-1.0" z="0.5"/>
+		<float name="radius" value="0.5"/>
+		<ref name="bsdf" id="glass_frosted"/>
+	</shape>
+
+	<!-- Small clear sphere on top of center -->
+	<shape type="sphere">
+		<point name="center" x="0.5" y="0.3" z="2.3"/>
+		<float name="radius" value="0.4"/>
+		<ref name="bsdf" id="glass_clear"/>
+	</shape>
+
+	<!-- Floor Materials -->
+	<bsdf type="diffuse" id="floor_white">
+		<rgb name="reflectance" value="0.9 0.9 0.9"/>
+	</bsdf>
+
+	<texture type="checkerboard" id="floor_tex">
+		<rgb name="color0" value="0.8 0.8 0.8"/>
+		<rgb name="color1" value="0.3 0.3 0.3"/>
+		<float name="uscale" value="10.0"/>
+		<float name="vscale" value="10.0"/>
+	</texture>
+
+	<bsdf type="diffuse" id="floor_checker">
+		<ref name="reflectance" id="floor_tex"/>
+	</bsdf>
+
+	<!-- Floor plane -->
+	<shape type="rectangle">
+		<transform name="toWorld">
+			<scale x="15" y="15" z="1"/>
+			<translate z="0"/>
+		</transform>
+		<ref name="bsdf" id="floor_checker"/>
+	</shape>
+
+	<!-- Back wall with slight color for reflections -->
+	<bsdf type="diffuse" id="wall_mat">
+		<rgb name="reflectance" value="0.6 0.65 0.7"/>
+	</bsdf>
+
+	<shape type="rectangle">
+		<transform name="toWorld">
+			<rotate x="1" angle="90"/>
+			<scale x="15" y="8" z="1"/>
+			<translate y="-5" z="4"/>
+		</transform>
+		<ref name="bsdf" id="wall_mat"/>
+	</shape>
+
+	<!-- Key light - main illumination -->
+	<shape type="sphere">
+		<point name="center" x="-3" y="2" z="5"/>
+		<float name="radius" value="0.8"/>
+		
+		<emitter type="area">
+			<rgb name="radiance" value="100 100 100"/>
+		</emitter>
+		
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0 0 0"/>
+		</bsdf>
+	</shape>
+
+	<!-- Fill light - softer -->
+	<shape type="sphere">
+		<point name="center" x="4" y="-1" z="4"/>
+		<float name="radius" value="0.5"/>
+		
+		<emitter type="area">
+			<rgb name="radiance" value="60 60 70"/>
+		</emitter>
+		
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0 0 0"/>
+		</bsdf>
+	</shape>
+
+	<!-- Back light for rim lighting -->
+	<shape type="sphere">
+		<point name="center" x="0" y="-5" z="5.5"/>
+		<float name="radius" value="0.6"/>
+		
+		<emitter type="area">
+			<rgb name="radiance" value="80 80 80"/>
+		</emitter>
+		
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0 0 0"/>
+		</bsdf>
+	</shape>
+
+</scene>

@@ -1,0 +1,5 @@
+Usage of LLM:
+1. Working inside Visual Studio Code, so used github copilot for code suggestions.
+2. Used Claude 4.6 Opus inside copilot agent for debugging path_tracing5 and final path_tracing files.
+4. Used github copilot for question writing completions. (Not for complete generation, mainly for finishing the rest of the sentence when main ideas are provided)
+5. Used Claude 4.6 Opus for constructing the XML structure for custom playground scenes, and then manually edited the content for fine-tuning.

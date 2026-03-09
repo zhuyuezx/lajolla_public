@@ -168,6 +168,47 @@ python3 final_project/animate_npr.py \
 
 ---
 
+### 8. NPR Post-Processing Pipeline (`NPR/post_processing/`)
+
+Three screen-space NPR effects were implemented in Python and demonstrated on
+personal photographs via the interactive notebook `NPR/npr_demo.ipynb`.
+
+#### 8a. 1-Bit Ordered Dithering — Obra Dinn style (`one_bit/obra_dinn.py`)
+
+Converts an image to a 2-colour palette using a **Bayer ordered-dither** matrix.
+Steps: (1) tone-map to LDR, (2) convert to luminance, (3) threshold against a
+tiled Bayer matrix (configurable size 2–4 → 4×4 to 16×16 patterns), (4) perform
+optional edge-enhancement before dithering, (5) remap the binary mask to the
+chosen colour palette (`obra_dinn`, `bw`, `sepia`, `green_phosphor`, …).
+
+![Obra Dinn — Geisel Library](npr_obra_dinn.png)
+
+#### 8b. Toon / Cel Shading (`toon_shading/toon.py`)
+
+Cel shading is achieved by **quantising the luminance channel** into a fixed
+number of discrete bands and then detecting and drawing outlines.  Steps:
+(1) tone-map, (2) convert to HSL, (3) snap the L channel to `num_bands` equal
+steps, (4) recompose HSL → RGB (preserving hue and saturation), (5) detect edges
+via a 4-connected neighbour luminance-difference test and paint them black.
+Optional colour quantisation (`quantize_colors`) additionally snaps hue and
+saturation to a coarse grid.
+
+![Toon shading — Beach View](npr_toon.png)
+
+#### 8c. Painterly Rendering (`painterly/painterly.py`)
+
+Three painting styles are supported, all built on a **Kuwahara anisotropic
+smoothing filter** that replaces each pixel with the mean of the lowest-variance
+quadrant in its neighbourhood, producing the characteristic oil-paint blocky
+abstraction.  The `litwinowicz` style additionally overlays oriented brush
+strokes along image-gradient directions (Litwinowicz 1997).  Colour palette
+reduction (uniform or k-means) reduces the final image to a target number of
+distinct colours.
+
+![Painterly — Campus Rainbow](npr_painterly.png)
+
+---
+
 ## Summary of Completed Work
 
 | Item | Status |
@@ -179,6 +220,9 @@ python3 final_project/animate_npr.py \
 | Sobel edge detection (4-neighbour comparison) | ✅ Done |
 | Normal AOV camera-facing flip (ceiling artefact fix) | ✅ Done |
 | Camera-orbit animation script | ✅ Done |
+| 1-bit Obra Dinn dithering (Python) | ✅ Done |
+| Toon / cel shading with outlines (Python) | ✅ Done |
+| Painterly rendering — Kuwahara + Litwinowicz (Python) | ✅ Done |
 
 ---
 

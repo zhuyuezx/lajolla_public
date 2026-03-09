@@ -11,8 +11,10 @@
          All parameters can be overridden; these are the defaults.
          ===================================================================== -->
     <integrator type="npr">
-        <!-- world-space direction the light comes FROM -->
-        <string name="lightDir"        value="1, 2, 2"/>
+        <!-- world-space direction the light comes FROM
+             -Z component ensures shadow rays exit through the open front of
+             the Cornell Box; +Y/+X differentiate top vs side faces. -->
+        <string name="lightDir"        value="0.5, 0.5, -1"/>
         <!-- warm white light -->
         <string name="lightColor"      value="1.0, 0.98, 0.90"/>
         <!-- flat ambient (dark, slightly warm) -->

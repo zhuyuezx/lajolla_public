@@ -31,7 +31,10 @@ struct RenderOptions {
     int max_null_collisions = 1000;
 
     // --- NPR (cel-shading) options ---
-    Vector3 npr_light_dir        = Vector3{1, 2, 2};   // world-space directional light
+    // Light direction (0.5, 0.5, -1): dominant -Z exits through the open
+    // front face of an enclosed Cornell Box so shadow rays aren't occluded
+    // by the ceiling/back wall.  +Y and +X still differentiate top/side faces.
+    Vector3 npr_light_dir        = Vector3{Real(0.5),  Real(0.5),  Real(-1.0)}; // world-space toward-light
     Vector3 npr_light_color      = Vector3{1, 1, 1};   // light RGB
     Vector3 npr_ambient          = Vector3{Real(0.05), Real(0.05), Real(0.07)}; // flat ambient
     Vector3 npr_shadow_tint      = Vector3{Real(0.5),  Real(0.5),  Real(0.6)};  // cool shadow

@@ -21,7 +21,10 @@
 #include <filesystem>
 #include <string>
 
-namespace fs = std::filesystem;
+// Small epsilon to offset shadow rays away from the surface and
+// to push the primary ray's tnear above zero — prevents self-intersection
+// ("shadow acne") on flat surfaces.
+static constexpr Real c_npr_ray_eps = Real(1e-3);
 
 // ---------------------------------------------------------------------------
 // AOV bundle filled per-pixel during the NPR render pass
@@ -49,9 +52,10 @@ static Spectrum npr_get_albedo(const Scene &scene, const PathVertex &v) {
 //
 // Implements:
 //   1. Flat shading  — vertex.geometric_normal, no barycentric interpolation
-//   2. Directional light — single infinite light from npr_light_dir
-//   3. Quantized cel shading — hard step at npr_cel_threshold
-//   4. Flat ambient — constant additive term
+//   2. Directional light — single infinite directional light (npr_light_dir)
+//   3. Hard shadow test  — shadow ray to infinity; hard tint if occluded
+//   4. Quantized cel shading — hard N·L step at npr_cel_threshold
+//   5. Flat ambient — constant additive term
 // ---------------------------------------------------------------------------
 static Spectrum npr_shade_pixel(const Scene &scene,
                                 const PathVertex &v,
@@ -67,21 +71,39 @@ static Spectrum npr_shade_pixel(const Scene &scene,
     // --- diffuse albedo from scene material ---
     Spectrum albedo = npr_get_albedo(scene, v);
 
-    // --- directional light shading ---
+    // --- directional light ---
     Vector3 L = normalize(opt.npr_light_dir);
     Real NdotL = dot(N, L);
 
-    // quantized / cel step function  ─────────────────────────────────
-    //   lit   : N·L > threshold  →  albedo * light_color
-    //   shadow: N·L ≤ threshold  →  albedo * cool shadow tint
+    // -----------------------------------------------------------------------
+    // Task 1 — Hard directional shadow ray
+    // Offset origin by epsilon along the surface normal to avoid
+    // self-intersection ("shadow acne").
+    // -----------------------------------------------------------------------
+    bool in_shadow = false;
+    if (NdotL > Real(0)) {
+        // Shadow ray from hit point toward the infinite light
+        Ray shadow_ray;
+        shadow_ray.org   = v.position + N * c_npr_ray_eps;  // Task 2 — bias
+        shadow_ray.dir   = L;
+        shadow_ray.tnear = Real(0);                        // already offset above
+        shadow_ray.tfar  = infinity<Real>();
+        in_shadow = occluded(scene, shadow_ray);
+    }
+
+    // -----------------------------------------------------------------------
+    // Quantized / cel step function
+    //   lit    : N·L > threshold AND not in shadow → albedo × light_color
+    //   shadow : occluded OR N·L ≤ threshold       → albedo × cool tint
+    // -----------------------------------------------------------------------
     Spectrum diffuse;
-    if (NdotL > opt.npr_cel_threshold) {
+    if (!in_shadow && NdotL > opt.npr_cel_threshold) {
         diffuse = albedo * opt.npr_light_color;
     } else {
         diffuse = albedo * opt.npr_shadow_tint;
     }
 
-    // flat ambient (prevents fully-black shadows)
+    // flat ambient (prevents fully-black cast shadows)
     Spectrum ambient = albedo * opt.npr_ambient;
 
     return diffuse + ambient;
@@ -118,6 +140,9 @@ Image3 npr_render(const Scene &scene, NprAovs &aovs) {
                 Ray ray = sample_primary(
                     scene.camera,
                     Vector2(Real(x + 0.5) / w, Real(y + 0.5) / h));
+                // Task 2 — enforce tnear epsilon on primary ray to avoid
+                // self-intersection artifacts on AOV passes.
+                ray.tnear = c_npr_ray_eps;
                 RayDifferential ray_diff = init_ray_differential(w, h);
 
                 if (std::optional<PathVertex> vertex_ = intersect(scene, ray, ray_diff)) {

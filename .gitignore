@@ -52,6 +52,5 @@ build/
 **/*.exr
 **/*.jpg
 **/*.pdf
-**/*.md
 **/*.gif
 **/*.mov

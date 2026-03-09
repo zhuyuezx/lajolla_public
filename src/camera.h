@@ -6,7 +6,7 @@
 #include "vector.h"
 #include "ray.h"
 
-/// Currently we only support a pinhole perspective camera
+/// Currently we support a pinhole perspective camera and an orthographic camera
 struct Camera {
     Camera() {}
     Camera(const Matrix4x4 &cam_to_world,
@@ -15,10 +15,21 @@ struct Camera {
            const Filter &filter,
            int medium_id);
 
+    /// Orthographic camera constructor.
+    /// ortho_scale controls the half-width of the view volume in world units.
+    Camera(const Matrix4x4 &cam_to_world,
+           int width, int height,
+           Real ortho_scale,
+           const Filter &filter,
+           int medium_id);
+
     Matrix4x4 sample_to_cam, cam_to_sample;
     Matrix4x4 cam_to_world, world_to_cam;
     int width, height;
     Filter filter;
+
+    bool is_ortho = false;   ///< true => orthographic projection
+    Real ortho_scale = Real(5); ///< half-width in world units (orthographic only)
 
     int medium_id; // for participating media rendering in homework 2
 };

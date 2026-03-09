@@ -583,6 +583,24 @@ RenderOptions parse_integrator(pugi::xml_node node,
         options.integrator = Integrator::RayDifferential;
     } else if (type == "mipmapLevel" || type == "mipmap_level") {
         options.integrator = Integrator::MipmapLevel;
+    } else if (type == "npr") {
+        options.integrator = Integrator::NPR;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "lightDir" || name == "light_dir") {
+                options.npr_light_dir = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "lightColor" || name == "light_color") {
+                options.npr_light_color = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "ambient") {
+                options.npr_ambient = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "shadowTint" || name == "shadow_tint") {
+                options.npr_shadow_tint = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "celThreshold" || name == "cel_threshold") {
+                options.npr_cel_threshold = parse_float(child.attribute("value").value(), default_map);
+            } else if (name == "backgroundColor" || name == "background_color") {
+                options.npr_background_color = parse_vector3(child.attribute("value").value(), default_map);
+            }
+        }
     } else {
         Error(std::string("Unsupported integrator: ") + type);
     }
@@ -784,6 +802,15 @@ std::tuple<Camera, std::string /* output filename */, ParsedSampler>
                 }
             }
         }
+    } else if (type == "orthographic") {
+        // Orthographic sensor — uses "scale" parameter (half-width in world units)
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "toWorld" || name == "to_world") {
+                to_world = parse_transform(child, default_map);
+            }
+            // "scale" is parsed later together with film dimensions
+        }
     } else {
         Error(std::string("Unsupported sensor: ") + type);
     }
@@ -840,6 +867,20 @@ std::tuple<Camera, std::string /* output filename */, ParsedSampler>
         Real diagonal = 2 * tan(radians(fov) / 2);
         Real width = diagonal / sqrt(1 + 1 / (aspect * aspect));
         fov = degrees(2 * atan(width / 2));
+    }
+
+    if (type == "orthographic") {
+        // For orthographic cameras read an optional "scale" child parameter.
+        Real ortho_scale = Real(5); // default half-width in world units
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "scale") {
+                ortho_scale = parse_float(child.attribute("value").value(), default_map);
+            }
+        }
+        return std::make_tuple(
+            Camera(to_world, width, height, ortho_scale, filter, medium_id),
+            filename, sampler);
     }
 
     return std::make_tuple(Camera(to_world, fov, width, height, filter, medium_id),

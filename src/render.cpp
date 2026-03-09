@@ -7,6 +7,10 @@
 #include "pcg.h"
 #include "progress_reporter.h"
 #include "scene.h"
+#include "../final_project/npr_integrator.h"
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 /// Render auxiliary buffers e.g., depth.
 Image3 aux_render(const Scene &scene) {
@@ -163,6 +167,22 @@ Image3 render(const Scene &scene) {
         return path_render(scene);
     } else if (scene.options.integrator == Integrator::VolPath) {
         return vol_path_render(scene);
+    } else if (scene.options.integrator == Integrator::NPR) {
+        NprAovs aovs;
+        Image3 color = npr_render(scene, aovs);
+
+        // Write AOVs next to the main output file
+        fs::path out_path(scene.output_filename);
+        fs::path dir  = out_path.parent_path();
+        std::string stem = out_path.stem().string();
+        std::string ext  = out_path.extension().string();
+        if (dir.empty()) dir = ".";
+
+        imwrite((dir / (stem + "_depth"    + ext)).string(), aovs.depth);
+        imwrite((dir / (stem + "_normal"   + ext)).string(), aovs.normal);
+        imwrite((dir / (stem + "_objectid" + ext)).string(), aovs.object_id);
+
+        return color;
     } else {
         assert(false);
         return Image3();

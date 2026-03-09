@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NPR Cornell Box  –  Skypop Collective style
+  Orthographic camera + cel-shaded NPR integrator.
+  Meshes are shared from the standard cbox scene.
+-->
+<scene version="0.4.0">
+
+    <!-- =====================================================================
+         NPR integrator: directional light, quantized cel shading, flat ambient
+         All parameters can be overridden; these are the defaults.
+         ===================================================================== -->
+    <integrator type="npr">
+        <!-- world-space direction the light comes FROM -->
+        <string name="lightDir"        value="1, 2, 2"/>
+        <!-- warm white light -->
+        <string name="lightColor"      value="1.0, 0.98, 0.90"/>
+        <!-- flat ambient (dark, slightly warm) -->
+        <string name="ambient"         value="0.05, 0.04, 0.06"/>
+        <!-- cool-toned shadow tint (classic ink-shadow trick) -->
+        <string name="shadowTint"      value="0.45, 0.45, 0.60"/>
+        <!-- N·L threshold: anything below is in shadow -->
+        <float  name="celThreshold"    value="0.1"/>
+        <!-- sky / miss color (soft blue-grey) -->
+        <string name="backgroundColor" value="0.75, 0.82, 0.95"/>
+    </integrator>
+
+    <!-- =====================================================================
+         Orthographic camera – isometric-style view of the Cornell Box
+         origin/target from slightly above and to the side for a 3/4 iso look.
+         scale = half-width of the view volume in world units (box is ~550 units)
+         ===================================================================== -->
+    <sensor type="orthographic">
+        <float name="scale" value="320"/>
+        <transform name="toWorld">
+            <!-- Position: above-right, looking toward box center (278,274,280) -->
+            <lookAt origin="700, 650, -400"
+                    target="278, 274, 280"
+                    up="0, 1, 0"/>
+        </transform>
+
+        <sampler type="independent">
+            <integer name="sampleCount" value="1"/>
+        </sampler>
+
+        <film type="hdrfilm">
+            <integer name="width"  value="512"/>
+            <integer name="height" value="512"/>
+            <rfilter type="box"/>
+        </film>
+    </sensor>
+
+    <!-- =====================================================================
+         Materials – simple flat RGB colours (Lambertian, albedo texture ignored
+         by NPR integrator; only the base colour is sampled)
+         ===================================================================== -->
+    <bsdf type="diffuse" id="white">
+        <rgb name="reflectance" value="0.73, 0.73, 0.73"/>
+    </bsdf>
+
+    <bsdf type="diffuse" id="red">
+        <rgb name="reflectance" value="0.65, 0.05, 0.05"/>
+    </bsdf>
+
+    <bsdf type="diffuse" id="green">
+        <rgb name="reflectance" value="0.12, 0.45, 0.15"/>
+    </bsdf>
+
+    <bsdf type="diffuse" id="light">
+        <rgb name="reflectance" value="0.78, 0.78, 0.78"/>
+    </bsdf>
+
+    <!-- =====================================================================
+         Geometry – reuse meshes from the standard cbox scene
+         ===================================================================== -->
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_luminaire.obj"/>
+        <transform name="toWorld">
+            <translate x="0" y="-0.5" z="0"/>
+        </transform>
+        <ref id="light"/>
+        <emitter type="area">
+            <spectrum name="radiance" value="400:0, 500:8, 600:15.6, 700:18.4"/>
+        </emitter>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_floor.obj"/>
+        <ref id="white"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_ceiling.obj"/>
+        <ref id="white"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_back.obj"/>
+        <ref id="white"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_greenwall.obj"/>
+        <ref id="green"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_redwall.obj"/>
+        <ref id="red"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_largebox.obj"/>
+        <ref id="white"/>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="../cbox/meshes/cbox_smallbox.obj"/>
+        <ref id="white"/>
+    </shape>
+
+</scene>

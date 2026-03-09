@@ -18,7 +18,8 @@ enum class Integrator {
     RayDifferential, // visualize radius & spread
     MipmapLevel,
     Path,
-    VolPath
+    VolPath,
+    NPR  // Non-Photorealistic Rendering (cel-shaded, flat, isometric)
 };
 
 struct RenderOptions {
@@ -28,6 +29,14 @@ struct RenderOptions {
     int rr_depth = 5;
     int vol_path_version = 0;
     int max_null_collisions = 1000;
+
+    // --- NPR (cel-shading) options ---
+    Vector3 npr_light_dir        = Vector3{1, 2, 2};   // world-space directional light
+    Vector3 npr_light_color      = Vector3{1, 1, 1};   // light RGB
+    Vector3 npr_ambient          = Vector3{Real(0.05), Real(0.05), Real(0.07)}; // flat ambient
+    Vector3 npr_shadow_tint      = Vector3{Real(0.5),  Real(0.5),  Real(0.6)};  // cool shadow
+    Real    npr_cel_threshold    = Real(0.1);           // N·L threshold
+    Vector3 npr_background_color = Vector3{Real(0.8),  Real(0.9),  Real(1.0)};  // sky/miss color
 };
 
 /// Bounding sphere

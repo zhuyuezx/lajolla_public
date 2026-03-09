@@ -140,9 +140,10 @@ Image3 npr_render(const Scene &scene, NprAovs &aovs) {
                 Ray ray = sample_primary(
                     scene.camera,
                     Vector2(Real(x + 0.5) / w, Real(y + 0.5) / h));
-                // Task 2 — enforce tnear epsilon on primary ray to avoid
-                // self-intersection artifacts on AOV passes.
-                ray.tnear = c_npr_ray_eps;
+                // Task 2 — enforce t_min on primary ray.
+                // Any hit with t < c_npr_ray_eps is discarded, preventing
+                // self-intersection at t ≈ 0 on flat surfaces.
+                ray.tnear = c_npr_ray_eps;  // 1e-3 world units
                 RayDifferential ray_diff = init_ray_differential(w, h);
 
                 if (std::optional<PathVertex> vertex_ = intersect(scene, ray, ray_diff)) {
@@ -152,9 +153,27 @@ Image3 npr_render(const Scene &scene, NprAovs &aovs) {
                     img(x, y) = npr_shade_pixel(scene, v, ray.dir);
 
                     // --- AOVs ---
-                    Real depth_val = length(v.position - ray.org);
-                    aovs.depth(x, y)     = Vector3{depth_val, depth_val, depth_val};
-                    aovs.normal(x, y)    = v.geometric_normal;  // [-1,1] range
+                    // Use projected depth (t along ray) — equivalent to
+                    // length() for a normalised ray, but stated explicitly.
+                    Real depth_val = dot(v.position - ray.org, ray.dir);
+                    aovs.depth(x, y) = Vector3{depth_val, depth_val, depth_val};
+
+                    // Normal AOV: store the camera-facing normal.
+                    // Some meshes (e.g. cbox_ceiling.obj) represent holes via
+                    // a counter-wound polygon whose raw geometric normal points
+                    // the OPPOSITE direction to the main face. Adjacent pixels
+                    // that hit the two winding groups would produce a normal
+                    // difference of 2.0 and generate a false edge cluster.
+                    // Flipping to face the camera makes both groups store the
+                    // same outward-facing direction →  diff = 0 → no false edge.
+                    Vector3 N_aov = normalize(v.geometric_normal);
+                    if (std::abs(N_aov[0]) < Real(1e-6)) N_aov[0] = Real(0);
+                    if (std::abs(N_aov[1]) < Real(1e-6)) N_aov[1] = Real(0);
+                    if (std::abs(N_aov[2]) < Real(1e-6)) N_aov[2] = Real(0);
+                    // Flip to camera-facing direction
+                    if (dot(N_aov, -ray.dir) < Real(0)) N_aov = -N_aov;
+                    aovs.normal(x, y) = N_aov;
+
                     Real id = Real(v.shape_id);
                     aovs.object_id(x, y) = Vector3{id, id, id};
                 } else {

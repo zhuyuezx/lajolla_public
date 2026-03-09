@@ -25,6 +25,9 @@
         <float  name="celThreshold"    value="0.1"/>
         <!-- sky / miss color (soft blue-grey) -->
         <string name="backgroundColor" value="0.75, 0.82, 0.95"/>
+        
+        
+        
     </integrator>
 
     <!-- =====================================================================
@@ -72,6 +75,17 @@
         <rgb name="reflectance" value="0.78, 0.78, 0.78"/>
     </bsdf>
 
+    <!-- Distinct colours for the two boxes so they stand out from the white walls -->
+    <bsdf type="diffuse" id="box_warm">
+        <!-- warm sandstone: distinguishes the tall box from the neutral background -->
+        <rgb name="reflectance" value="0.76, 0.62, 0.42"/>
+    </bsdf>
+
+    <bsdf type="diffuse" id="box_cool">
+        <!-- cool slate-blue: distinguishes the short box from the tall box and walls -->
+        <rgb name="reflectance" value="0.45, 0.58, 0.72"/>
+    </bsdf>
+
     <!-- =====================================================================
          Geometry – reuse meshes from the standard cbox scene
          ===================================================================== -->
@@ -113,12 +127,12 @@
 
     <shape type="obj">
         <string name="filename" value="../cbox/meshes/cbox_largebox.obj"/>
-        <ref id="white"/>
+        <ref id="box_warm"/>
     </shape>
 
     <shape type="obj">
         <string name="filename" value="../cbox/meshes/cbox_smallbox.obj"/>
-        <ref id="white"/>
+        <ref id="box_cool"/>
     </shape>
 
 </scene>

@@ -153,8 +153,8 @@ def edge_mask(aov, threshold, dilate=0):
 # ---------------------------------------------------------------------------
 
 def run_sobel_pass(color_path: str,
-                   depth_thresh: float  = 0.10,
-                   normal_thresh: float = 0.50,
+                   depth_thresh: float  = 0.01,
+                   normal_thresh: float = 0.10,
                    id_thresh: float     = 1e-3,
                    outline_color        = (0.0, 0.0, 0.0),
                    outline_width: int   = 1,
@@ -198,6 +198,38 @@ def run_sobel_pass(color_path: str,
         write_exr(out, result)
         print(f'[sobel_post] Debug AOV ({debug_aov}) written -> {out}')
         return result
+
+    # Task 3 — NaN / Infinity trap
+    # If any AOV contains non-finite values, write a magenta debug image and abort.
+    def _check_finite(arr, label):
+        mask = ~np.isfinite(arr)
+        if mask.any():
+            return mask
+        return None
+
+    bad_depth  = _check_finite(depth,    'depth')
+    bad_normal = _check_finite(normal,   'normal')
+    bad_id     = _check_finite(objectid, 'objectid')
+    any_bad    = np.zeros((h, w), dtype=bool)
+    if bad_depth  is not None: any_bad |= bad_depth.any(axis=-1)
+    if bad_normal is not None: any_bad |= bad_normal.any(axis=-1)
+    if bad_id     is not None: any_bad |= bad_id.any(axis=-1)
+    if any_bad.any():
+        count = int(any_bad.sum())
+        print(f'[sobel_post] WARNING: {count} pixels contain NaN/Inf in AOV buffers!')
+        print(f'             depth  bad: {int(bad_depth.any(-1).sum())  if bad_depth  is not None else 0}')
+        print(f'             normal bad: {int(bad_normal.any(-1).sum()) if bad_normal is not None else 0}')
+        print(f'             id     bad: {int(bad_id.any(-1).sum())     if bad_id     is not None else 0}')
+        # Write a magenta debug image highlighting the corrupt pixels
+        debug_img = color.copy()
+        debug_img[any_bad] = np.array([1.0, 0.0, 1.0], dtype=np.float32)  # magenta
+        dbg_path = (output_path or (stem + '_outlined' + ext)).replace('.exr', '_nan_debug.exr')
+        write_exr(dbg_path, debug_img)
+        print(f'[sobel_post] Magenta debug image written -> {dbg_path}')
+        # Replace bad values with safe defaults so edge detection can still run
+        depth   = np.where(np.isfinite(depth),   depth,   -1.0)
+        normal  = np.where(np.isfinite(normal),  normal,   0.0)
+        objectid= np.where(np.isfinite(objectid),objectid, -1.0)
 
     # valid-pixel mask (depth >= 0 means the ray hit geometry)
     valid = (depth[:, :, 0] >= 0)
@@ -307,13 +339,13 @@ def main():
     p.add_argument("--outline", default="0,0,0", type=_parse_rgb,
                    metavar="R,G,B",
                    help="Outline colour in linear float (default: 0,0,0 = black)")
-    p.add_argument("--depth_thresh",  type=float, default=0.05,
+    p.add_argument("--depth_thresh",  type=float, default=0.01,
                    help="Depth-difference threshold for edge detection, as a "
-                        "fraction of the total depth range [0,1] (default 0.05)")
-    p.add_argument("--normal_thresh", type=float, default=0.50,
+                        "fraction of the total depth range [0,1] (default 0.01)")
+    p.add_argument("--normal_thresh", type=float, default=0.10,
                    help="Normal-difference threshold: Euclidean length of the "
                         "per-pixel normal vector difference in [-1,1] space "
-                        "(max 2.0 at 180 deg; 1.41 at 90 deg; default 0.50)")
+                        "(max 2.0 at 180 deg; 1.41 at 90 deg; default 0.10)")
     p.add_argument("--id_thresh",     type=float, default=1e-3,
                    help="(Legacy, not used.) Object-ID comparison is now a "
                         "direct integer check (any ID boundary is an edge).")

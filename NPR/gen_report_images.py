@@ -53,8 +53,8 @@ save_compare(img, result, 'Original — Beach View',
 
 # 3. Painterly — Campus Rainbow
 img = read_image(os.path.join(IMG_DIR, 'campus_rainbow.jpg'))
-result = painterly_effect(img, tone_map_method='clamp', style='oil',
-                          kuwahara_radius=4, num_colors=20)
+result = painterly_effect(img, tone_map_method='clamp', style='litwinowicz',
+                     grid_spacing=4, stroke_length=10, brush_radius=4)
 save_compare(img, result, 'Original — Campus Rainbow',
              'Painterly (Kuwahara oil)', os.path.join(OUT_DIR, 'npr_painterly.png'))
 

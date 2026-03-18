@@ -151,3 +151,13 @@ add_executable(test_mipmap src/tests/mipmap.cpp)
 target_link_libraries(test_mipmap lajolla_lib)
 add_test(mipmap test_mipmap)
 set_tests_properties(mipmap PROPERTIES PASS_REGULAR_EXPRESSION "SUCCESS")
+
+# ── Interactive NPR Viewer (SDL2 + Embree) ──────────────────────────────────
+add_executable(interactive_viewer final_project/interactive_viewer.cpp)
+target_include_directories(interactive_viewer PRIVATE
+    ${EMBREE_INCLUDE_PATH}
+    /opt/homebrew/include/SDL2)
+target_link_libraries(interactive_viewer
+    ${EMBREE_LIBRARY}
+    -L/opt/homebrew/lib -lSDL2)
+target_compile_definitions(interactive_viewer PRIVATE _THREAD_SAFE)

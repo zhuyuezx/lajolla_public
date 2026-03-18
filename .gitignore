@@ -54,3 +54,4 @@ build/
 **/*.pdf
 **/*.gif
 **/*.mov
+.cache/*

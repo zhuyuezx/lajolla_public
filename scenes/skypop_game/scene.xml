@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Skypop Collective — Game Scene
+  Orthographic camera + NPR cel-shaded integrator
+  Low-poly humanoid, three tree variants, flat ground island
+-->
+<scene version="0.4.0">
+
+    <!-- =================================================================
+         NPR Integrator — Skypop Collective Game Lighting
+         Bright, sunny game environment with cool ink-shadows
+         ================================================================= -->
+    <integrator type="npr">
+        <!-- Sunlight from upper-right-front — gives isometric depth cues.
+             The +Y component lights tops of objects, +X catches right faces,
+             −Z points toward the camera for good frontal fill. -->
+        <string name="lightDir"        value="0.6, 0.8, -0.5"/>
+
+        <!-- Bright warm-white sun — slightly warm to feel sunny -->
+        <string name="lightColor"      value="1.0, 0.97, 0.88"/>
+
+        <!-- Low warm ambient so shadows aren't pure black -->
+        <string name="ambient"         value="0.06, 0.05, 0.07"/>
+
+        <!-- Cool blue-violet shadow tint — the classic ink-shadow trick
+             used in hand-drawn illustration and Skypop's games -->
+        <string name="shadowTint"      value="0.42, 0.44, 0.62"/>
+
+        <!-- Hard cel threshold: anything below this N·L gets shadow tint.
+             Low value = thin shadow band, high value = wide shadows -->
+        <float  name="celThreshold"    value="0.1"/>
+
+        <!-- Bright sky-blue background — sunny game environment -->
+        <string name="backgroundColor" value="0.58, 0.80, 0.98"/>
+    </integrator>
+
+    <!-- =================================================================
+         Orthographic Camera — Isometric Game Perspective
+         45° downward view, no perspective distortion.
+         scale = half-width of view volume in world units.
+         ================================================================= -->
+    <sensor type="orthographic">
+        <!-- scale controls how much of the world fits in the frame.
+             Character is ~2.4 units tall, ground is ±12 units.
+             scale=10 frames the character + nearby trees comfortably. -->
+        <float name="scale" value="10"/>
+
+        <transform name="toWorld">
+            <!-- Classic isometric angle: 45° azimuth, ~35° elevation.
+                 origin: camera position (upper-right-front)
+                 target: character center (slightly above ground)
+                 up:     world +Y                                   -->
+            <lookAt origin="15, 14, 15"
+                    target="0, 1.2, 0"
+                    up="0, 1, 0"/>
+        </transform>
+
+        <sampler type="independent">
+            <!-- NPR is deterministic — 1 sample per pixel is sufficient -->
+            <integer name="sampleCount" value="1"/>
+        </sampler>
+
+        <film type="hdrfilm">
+            <integer name="width"  value="800"/>
+            <integer name="height" value="600"/>
+            <rfilter type="box"/>
+        </film>
+    </sensor>
+
+    <!-- =================================================================
+         Materials — Hand-Tuned Flat Colours
+         Each object gets a distinct Skypop-style base colour.
+         All use Lambertian (diffuse) — the NPR integrator reads
+         only the base albedo, ignoring BRDF evaluation.
+         ================================================================= -->
+
+    <!-- Character skin — warm peach / skin tone -->
+    <bsdf type="diffuse" id="skin">
+        <rgb name="reflectance" value="0.88, 0.72, 0.58"/>
+    </bsdf>
+
+    <!-- Tree trunk — warm brown -->
+    <bsdf type="diffuse" id="trunk">
+        <rgb name="reflectance" value="0.52, 0.38, 0.26"/>
+    </bsdf>
+
+    <!-- Tree A foliage — rich forest green -->
+    <bsdf type="diffuse" id="foliage_a">
+        <rgb name="reflectance" value="0.30, 0.62, 0.32"/>
+    </bsdf>
+
+    <!-- Tree B foliage — warm olive green -->
+    <bsdf type="diffuse" id="foliage_b">
+        <rgb name="reflectance" value="0.48, 0.65, 0.28"/>
+    </bsdf>
+
+    <!-- Tree C foliage — cool teal green -->
+    <bsdf type="diffuse" id="foliage_c">
+        <rgb name="reflectance" value="0.25, 0.58, 0.52"/>
+    </bsdf>
+
+    <!-- Ground — warm ochre / sandy -->
+    <bsdf type="diffuse" id="ground_mat">
+        <rgb name="reflectance" value="0.76, 0.68, 0.48"/>
+    </bsdf>
+
+    <!-- =================================================================
+         Geometry — Low-Poly Procedural Meshes
+         ================================================================= -->
+
+    <!-- Ground plane (island base) -->
+    <shape type="obj">
+        <string name="filename" value="meshes/ground.obj"/>
+        <ref id="ground_mat"/>
+    </shape>
+
+    <!-- Character — standing at the origin -->
+    <shape type="obj">
+        <string name="filename" value="meshes/character.obj"/>
+        <ref id="skin"/>
+    </shape>
+
+    <!-- Tree A — conical, placed to the right of the character -->
+    <shape type="obj">
+        <string name="filename" value="meshes/tree_a.obj"/>
+        <transform name="toWorld">
+            <translate x="4" y="0" z="-2"/>
+        </transform>
+        <ref id="foliage_a"/>
+    </shape>
+
+    <!-- Tree B — tiered, placed behind-left -->
+    <shape type="obj">
+        <string name="filename" value="meshes/tree_b.obj"/>
+        <transform name="toWorld">
+            <translate x="-3.5" y="0" z="-4"/>
+        </transform>
+        <ref id="foliage_b"/>
+    </shape>
+
+    <!-- Tree C — bushy, placed behind-right -->
+    <shape type="obj">
+        <string name="filename" value="meshes/tree_c.obj"/>
+        <transform name="toWorld">
+            <translate x="3" y="0" z="-6"/>
+        </transform>
+        <ref id="foliage_c"/>
+    </shape>
+
+    <!-- Additional Tree A copy — far left for scene depth -->
+    <shape type="obj">
+        <string name="filename" value="meshes/tree_a.obj"/>
+        <transform name="toWorld">
+            <translate x="-6" y="0" z="3"/>
+        </transform>
+        <ref id="foliage_a"/>
+    </shape>
+
+    <!-- Additional Tree C copy — near camera for framing -->
+    <shape type="obj">
+        <string name="filename" value="meshes/tree_c.obj"/>
+        <transform name="toWorld">
+            <translate x="6" y="0" z="4"/>
+        </transform>
+        <ref id="foliage_c"/>
+    </shape>
+
+</scene>

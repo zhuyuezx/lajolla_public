@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  SCULPTURE GARDEN — Multi-Style Showcase (West 2024)
+
+  An open-air gallery with spheres on pedestals and floating orbs.
+  Each object receives a different style function:
+    • Cel-shading  (golden pedestal + sky-blue sphere)
+    • Tie-Dye      (emerald column + lavender floating orb)
+    • ACP ramp     (coral sphere on short pedestal)
+
+  No Cornell Box — just a ground plane, open sky background,
+  and a large overhead area light.
+  ═══════════════════════════════════════════════════════════════════
+-->
+
+<scene version="0.4.0">
+
+	<!-- === Integrator: Stylized PT with per-object style dispatch === -->
+	<integrator type="stylized_pt">
+		<integer name="maxDepth"          value="-1"/>
+		<integer name="inner_samples"     value="256"/>
+		<float   name="transition_t"      value="1.0"/>
+
+		<!-- Per-object style assignment (by shape ID):
+		     0: area light      (not styled)
+		     1: ground plane    (not styled)
+		     2: tall pedestal   (cel)
+		     3: sphere on tall  (cel)
+		     4: short pedestal  (acp)
+		     5: sphere on short (acp)
+		     6: column          (tiedye)
+		     7: orb near column (tiedye)
+		     8: floating orb    (cel)
+		     9: wide pedestal   (acp)
+		-->
+		<string  name="cel_ids"           value="2,3,8"/>
+		<string  name="tiedye_ids"        value="6,7"/>
+		<string  name="acp_ids"           value="4,5,9"/>
+
+		<!-- Cel-shading: crisp lit/shadow with warm light -->
+		<float   name="cel_threshold"     value="0.08"/>
+		<vector  name="shadow_tint"       value="0.35, 0.30, 0.55"/>
+		<vector  name="ambient"           value="0.08, 0.07, 0.10"/>
+		<vector  name="light_color"       value="1.0, 0.97, 0.90"/>
+
+		<!-- Tie-Dye: psychedelic per-channel cosine waves -->
+		<vector  name="tie_dye_freq"      value="12.0, 16.0, 20.0"/>
+		<vector  name="tie_dye_phase"     value="0.5, 2.5, 4.5"/>
+
+		<!-- ACP: deep indigo → sunset orange colour ramp -->
+		<vector  name="acp_dark_color"    value="0.06, 0.02, 0.18"/>
+		<vector  name="acp_bright_color"  value="1.0, 0.50, 0.15"/>
+
+		<!-- Sky background -->
+		<vector  name="background_color"  value="0.55, 0.78, 0.96"/>
+	</integrator>
+
+	<!-- === Camera: perspective, looking at the garden === -->
+	<sensor type="perspective">
+		<string name="fovAxis" value="smaller"/>
+		<float name="nearClip" value="0.1"/>
+		<float name="farClip" value="200"/>
+		<float name="focusDistance" value="25"/>
+		<transform name="toWorld">
+			<lookAt origin="18, 12, 20"
+			        target="0, 3, -2"
+			        up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="ldsampler">
+			<integer name="sampleCount" value="16"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="640"/>
+			<integer name="height" value="480"/>
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<!-- === Materials === -->
+
+	<!-- Overhead light surface -->
+	<bsdf type="diffuse" id="light_mat">
+		<rgb name="reflectance" value="1, 1, 1"/>
+	</bsdf>
+
+	<!-- Ground: warm sandy stone -->
+	<bsdf type="diffuse" id="ground_mat">
+		<rgb name="reflectance" value="0.72, 0.68, 0.55"/>
+	</bsdf>
+
+	<!-- Cel: golden marble pedestal -->
+	<bsdf type="diffuse" id="mat_gold">
+		<rgb name="reflectance" value="0.90, 0.72, 0.20"/>
+	</bsdf>
+
+	<!-- Cel: sky-blue sphere -->
+	<bsdf type="diffuse" id="mat_sky">
+		<rgb name="reflectance" value="0.35, 0.60, 0.92"/>
+	</bsdf>
+
+	<!-- ACP: warm terracotta pedestal -->
+	<bsdf type="diffuse" id="mat_terra">
+		<rgb name="reflectance" value="0.78, 0.42, 0.22"/>
+	</bsdf>
+
+	<!-- ACP: coral sphere -->
+	<bsdf type="diffuse" id="mat_coral">
+		<rgb name="reflectance" value="0.88, 0.40, 0.35"/>
+	</bsdf>
+
+	<!-- Tiedye: deep emerald column -->
+	<bsdf type="diffuse" id="mat_emerald">
+		<rgb name="reflectance" value="0.15, 0.60, 0.40"/>
+	</bsdf>
+
+	<!-- Tiedye: lavender orb -->
+	<bsdf type="diffuse" id="mat_lavender">
+		<rgb name="reflectance" value="0.62, 0.42, 0.82"/>
+	</bsdf>
+
+	<!-- Cel: floating orb — bright white -->
+	<bsdf type="diffuse" id="mat_pearl">
+		<rgb name="reflectance" value="0.92, 0.90, 0.88"/>
+	</bsdf>
+
+	<!-- ACP: wide pedestal -->
+	<bsdf type="diffuse" id="mat_slate">
+		<rgb name="reflectance" value="0.45, 0.48, 0.55"/>
+	</bsdf>
+
+	<!-- === Geometry === -->
+
+	<!-- Shape 0: Area light — high above and behind camera (invisible) -->
+	<shape type="rectangle">
+		<transform name="toWorld">
+			<scale x="15" y="15" z="1"/>
+			<rotate x="1" angle="90"/>
+			<translate x="0" y="50" z="10"/>
+		</transform>
+		<ref id="light_mat"/>
+		<emitter type="area">
+			<rgb name="radiance" value="18.0, 16.0, 13.0"/>
+		</emitter>
+	</shape>
+
+	<!-- Shape 1: Ground plane -->
+	<shape type="obj">
+		<string name="filename" value="meshes/ground.obj"/>
+		<ref id="ground_mat"/>
+	</shape>
+
+	<!-- Shape 2: Tall pedestal (CEL) — left-centre -->
+	<shape type="obj">
+		<string name="filename" value="meshes/pedestal_tall.obj"/>
+		<transform name="toWorld">
+			<translate x="-5" y="0" z="-3"/>
+		</transform>
+		<ref id="mat_gold"/>
+	</shape>
+
+	<!-- Shape 3: Sky-blue sphere on tall pedestal (CEL) -->
+	<shape type="sphere">
+		<point name="center" x="-5" y="5.5" z="-3"/>
+		<float name="radius" value="1.4"/>
+		<ref id="mat_sky"/>
+	</shape>
+
+	<!-- Shape 4: Short pedestal (ACP) — right -->
+	<shape type="obj">
+		<string name="filename" value="meshes/pedestal_short.obj"/>
+		<transform name="toWorld">
+			<translate x="5" y="0" z="0"/>
+		</transform>
+		<ref id="mat_terra"/>
+	</shape>
+
+	<!-- Shape 5: Coral sphere on short pedestal (ACP) -->
+	<shape type="sphere">
+		<point name="center" x="5" y="3.3" z="0"/>
+		<float name="radius" value="1.2"/>
+		<ref id="mat_coral"/>
+	</shape>
+
+	<!-- Shape 6: Column (TIEDYE) — back-left -->
+	<shape type="obj">
+		<string name="filename" value="meshes/column.obj"/>
+		<transform name="toWorld">
+			<translate x="-1" y="0" z="-8"/>
+		</transform>
+		<ref id="mat_emerald"/>
+	</shape>
+
+	<!-- Shape 7: Lavender floating orb near column (TIEDYE) -->
+	<shape type="sphere">
+		<point name="center" x="-1" y="8" z="-8"/>
+		<float name="radius" value="1.0"/>
+		<ref id="mat_lavender"/>
+	</shape>
+
+	<!-- Shape 8: Floating pearl orb (CEL) — high right -->
+	<shape type="sphere">
+		<point name="center" x="7" y="9" z="-5"/>
+		<float name="radius" value="0.9"/>
+		<ref id="mat_pearl"/>
+	</shape>
+
+	<!-- Shape 9: Wide pedestal (ACP) — front-centre -->
+	<shape type="obj">
+		<string name="filename" value="meshes/pedestal_wide.obj"/>
+		<transform name="toWorld">
+			<translate x="1" y="0" z="4"/>
+		</transform>
+		<ref id="mat_slate"/>
+	</shape>
+
+</scene>

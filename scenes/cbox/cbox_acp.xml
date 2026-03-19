@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ====================================================================
+     ACP Color Mapping (West 2024, Fig 7)
+     Pillars (6,7) receive artistic colour palette ramp (purple → gold).
+     ==================================================================== -->
+
+<scene version="0.4.0">
+	<integrator type="stylized_pt">
+		<integer name="maxDepth"          value="-1"/>
+		<integer name="inner_samples"     value="256"/>
+
+		<!-- Style selection -->
+		<string  name="style_type"        value="acp"/>
+		<float   name="transition_t"      value="1.0"/>
+		<string  name="target_ids"        value="6,7"/>
+
+		<!-- ACP ramp: deep purple (shadow) → warm gold (lit) -->
+		<vector  name="acp_dark_color"    value="0.05, 0.0, 0.15"/>
+		<vector  name="acp_bright_color"  value="1.0, 0.85, 0.3"/>
+
+		<!-- Background -->
+		<vector  name="background_color"  value="0.8, 0.9, 1.0"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<string name="fovAxis" value="smaller"/>
+		<float name="nearClip" value="10"/>
+		<float name="farClip" value="2800"/>
+		<float name="focusDistance" value="1000"/>
+		<transform name="toWorld">
+			<lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="39.3077"/>
+
+		<sampler type="ldsampler">
+			<integer name="sampleCount" value="4"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="512"/>
+			<integer name="height" value="512"/>
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<!-- Warm golden pillar (small box) -->
+	<bsdf type="diffuse" id="box_small">
+		<rgb name="reflectance" value="0.85, 0.65, 0.15"/>
+	</bsdf>
+
+	<!-- Cool blue pillar (large box) -->
+	<bsdf type="diffuse" id="box_large">
+		<rgb name="reflectance" value="0.20, 0.45, 0.80"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="white">
+		<rgb name="reflectance" value="0.73, 0.71, 0.68"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="red">
+		<rgb name="reflectance" value="0.63, 0.06, 0.04"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="green">
+		<rgb name="reflectance" value="0.15, 0.48, 0.09"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light">
+		<rgb name="reflectance" value="0.78, 0.78, 0.78"/>
+	</bsdf>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_luminaire.obj"/>
+		<transform name="toWorld">
+			<translate x="0" y="-0.5" z="0"/>
+		</transform>
+		<ref id="light"/>
+		<emitter type="area">
+			<rgb name="radiance" value="17.0, 12.0, 4.0"/>
+		</emitter>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_floor.obj"/>
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_ceiling.obj"/>
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_back.obj"/>
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_greenwall.obj"/>
+		<ref id="green"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_redwall.obj"/>
+		<ref id="red"/>
+	</shape>
+
+	<!-- Shape ID 6: small box (target) -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_smallbox.obj"/>
+		<ref id="box_small"/>
+	</shape>
+
+	<!-- Shape ID 7: large box (target) -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_largebox.obj"/>
+		<ref id="box_large"/>
+	</shape>
+</scene>

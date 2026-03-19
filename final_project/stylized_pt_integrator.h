@@ -216,22 +216,77 @@ static Spectrum stylized_apply_g_theta(const Scene &scene,
 }
 
 // ---------------------------------------------------------------------------
-// Helper: check if shape_id is in the target list
+// Helpers: check if shape_id is in a per-style target list
 // ---------------------------------------------------------------------------
-static bool is_target_object(const Scene &scene, int shape_id) {
-    const auto &ids = scene.options.target_object_ids;
+static bool is_in_list(const std::vector<int> &ids, int shape_id) {
     for (int id : ids) {
         if (id == shape_id) return true;
     }
     return false;
 }
 
+// Returns 0=none, 1=cel, 2=tiedye, 3=acp
+static int get_style_for_shape(const Scene &scene, int shape_id) {
+    const auto &opt = scene.options;
+    // Per-style lists take priority
+    if (is_in_list(opt.cel_target_ids, shape_id))    return 1;
+    if (is_in_list(opt.tiedye_target_ids, shape_id)) return 2;
+    if (is_in_list(opt.acp_target_ids, shape_id))    return 3;
+    // Backward compat: old target_object_ids + style_type
+    if (is_in_list(opt.target_object_ids, shape_id)) {
+        if (opt.style_type == "tiedye") return 2;
+        if (opt.style_type == "acp")    return 3;
+        return 1; // default cel
+    }
+    return 0; // non-target
+}
+
+static bool is_any_target(const Scene &scene, int shape_id) {
+    return get_style_for_shape(scene, shape_id) != 0;
+}
+
+// ---------------------------------------------------------------------------
+// Style function g_θ: "Tie-Dye" cosine effect (West Fig 11).
+//
+// Applies per-channel cosine waves to the physical radiance, creating
+// psychedelic colour shifts that depend on luminance and frequency.
+// Purely colour-based — no occlusion/shadow logic needed.
+// ---------------------------------------------------------------------------
+static Spectrum stylized_apply_tiedye(const Scene &scene,
+                                      const Spectrum &averaged_radiance) {
+    const auto &opt = scene.options;
+    Spectrum result;
+    result[0] = std::abs(std::cos(opt.tie_dye_freq.x * averaged_radiance[0] + opt.tie_dye_phase.x));
+    result[1] = std::abs(std::cos(opt.tie_dye_freq.y * averaged_radiance[1] + opt.tie_dye_phase.y));
+    result[2] = std::abs(std::cos(opt.tie_dye_freq.z * averaged_radiance[2] + opt.tie_dye_phase.z));
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// Style function g_θ: Artistic Color Palette / ACP (West Fig 7).
+//
+// Maps physical luminance → a two-stop colour ramp (dark ↔ bright).
+// Purely colour-based — no occlusion/shadow logic needed.
+// ---------------------------------------------------------------------------
+static Spectrum stylized_apply_acp(const Scene &scene,
+                                   const Spectrum &averaged_radiance) {
+    const auto &opt = scene.options;
+    Real lum = luminance(averaged_radiance);
+    lum = std::max(Real(0), std::min(Real(1), lum));  // clamp [0,1]
+    Spectrum dark   = fromRGB(opt.acp_dark_color);
+    Spectrum bright = fromRGB(opt.acp_bright_color);
+    return dark * (Real(1) - lum) + bright * lum;
+}
+
 // ---------------------------------------------------------------------------
 // Main per-pixel stylized path tracing function.
 //
-// Object-ID parameterized:
-//   - Non-target shapes → 1-sample PBR (cheap)
-//   - Target shapes     → k-sample inner estimate + g_θ with Y-sweep transition
+// Per-object style dispatch:
+//   - cel_target_ids    → k-sample ⟨I⟩ + cel g_θ
+//   - tiedye_target_ids → k-sample ⟨I⟩ + tiedye g_θ
+//   - acp_target_ids    → k-sample ⟨I⟩ + acp g_θ
+//   - all other shapes  → 1-sample PBR (cheap fallback)
+// All styles use the same transition_t crossfade.
 // ---------------------------------------------------------------------------
 static Spectrum stylized_path_tracing(const Scene &scene,
                                       int x, int y,
@@ -253,13 +308,15 @@ static Spectrum stylized_path_tracing(const Scene &scene,
     PathVertex vertex = *vertex_;
     Vector3 dir_view = -ray.dir;
 
-    // --- Non-target object: standard single-sample PBR ---
-    if (!scene.options.target_object_ids.empty() &&
-        !is_target_object(scene, vertex.shape_id)) {
+    // --- Check which style this object gets ---
+    int style_id = get_style_for_shape(scene, vertex.shape_id);
+
+    // Non-target: standard single-sample PBR
+    if (style_id == 0) {
         return stylized_inner_trace(scene, vertex, dir_view, ray_diff, rng);
     }
 
-    // --- Target object: k-sample inner estimate ---
+    // --- Target object: k-sample inner estimate ⟨I⟩ ---
     Spectrum albedo = make_const_spectrum(Real(0.8));
     if (vertex.material_id >= 0) {
         const Material &mat = scene.materials[vertex.material_id];
@@ -278,22 +335,28 @@ static Spectrum stylized_path_tracing(const Scene &scene,
     }
     Spectrum averaged_radiance = inner_sum / Real(k);
 
-    // --- Temporal crossfade: t blends uniformly between PBR and cel ---
+    // --- Apply the per-object style function g_θ ---
+    auto apply_style = [&](const Spectrum &avg_rad) -> Spectrum {
+        switch (style_id) {
+            case 2:  return stylized_apply_tiedye(scene, avg_rad);
+            case 3:  return stylized_apply_acp(scene, avg_rad);
+            default: return stylized_apply_g_theta(scene, albedo, avg_rad);
+        }
+    };
+
+    // --- Temporal crossfade: t blends uniformly between PBR and styled ---
     Real t = scene.options.transition_t;
 
-    // t >= 1.0 → full cel
-    if (scene.options.target_object_ids.empty() || t >= Real(1)) {
-        return stylized_apply_g_theta(scene, albedo, averaged_radiance);
+    if (t >= Real(1)) {
+        return apply_style(averaged_radiance);
     }
-    // t <= 0 → full PBR
     if (t <= Real(0)) {
         return averaged_radiance;
     }
 
-    // Uniform blend: lerp(PBR, Cel, t)
     Spectrum pbr_color = averaged_radiance;
-    Spectrum cel_color = stylized_apply_g_theta(scene, albedo, averaged_radiance);
-    return pbr_color * (Real(1) - t) + cel_color * t;
+    Spectrum styled_color = apply_style(averaged_radiance);
+    return pbr_color * (Real(1) - t) + styled_color * t;
 }
 
 // ---------------------------------------------------------------------------

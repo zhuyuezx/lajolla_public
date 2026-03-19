@@ -44,8 +44,26 @@ struct RenderOptions {
 
     // --- Stylized PT (West 2024) options ---
     int stylized_inner_samples = 16;  // k inner MC samples for ⟨I⟩ estimate
-    Real transition_t = Real(0);      // 0.0 = full PBR, 1.0 = full cel on targets
-    std::vector<int> target_object_ids; // shape IDs to stylize (others stay PBR)
+    Real transition_t = Real(0);      // 0.0 = full PBR, 1.0 = full styled on targets
+
+    // Per-style target ID lists (shape IDs → different g_θ functions)
+    std::vector<int> cel_target_ids;     // cel-shading
+    std::vector<int> tiedye_target_ids;  // tie-dye cosine
+    std::vector<int> acp_target_ids;     // ACP colour ramp
+
+    // Backward compat: if the old target_object_ids is set, treat as cel
+    std::vector<int> target_object_ids;
+
+    // Style variant (used only for single-style mode): "cel", "tiedye", "acp"
+    std::string style_type = "cel";
+
+    // Tie-Dye cosine parameters (per-channel frequency and phase)
+    Vector3 tie_dye_freq  = Vector3{Real(5), Real(7), Real(11)};
+    Vector3 tie_dye_phase = Vector3{Real(0), Real(2), Real(4)};
+
+    // ACP (Artistic Color Palette) ramp endpoints
+    Vector3 acp_dark_color   = Vector3{Real(0.05), Real(0.0), Real(0.15)};  // deep purple
+    Vector3 acp_bright_color = Vector3{Real(1.0),  Real(0.85), Real(0.3)};  // warm gold
 };
 
 /// Bounding sphere

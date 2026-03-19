@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ====================================================================
+     Style Gallery — Multiple objects, multiple styles (West 2024)
+     Uses Cornell Box as enclosure with spheres and boxes, each assigned
+     a different style function:
+       Shape 6 (small box)  → cel-shading
+       Shape 7 (large box)  → tie-dye cosine
+       Shape 8 (sphere #1)  → ACP colour ramp
+       Shape 9 (sphere #2)  → cel-shading
+       Shape 10 (sphere #3) → tie-dye cosine
+     ==================================================================== -->
+
+<scene version="0.4.0">
+	<integrator type="stylized_pt">
+		<integer name="maxDepth"          value="-1"/>
+		<integer name="inner_samples"     value="128"/>
+		<float   name="transition_t"      value="1.0"/>
+
+		<!-- Per-object style assignment -->
+		<string  name="cel_ids"           value="6,9"/>
+		<string  name="tiedye_ids"        value="7,10"/>
+		<string  name="acp_ids"           value="8"/>
+
+		<!-- Cel-shading parameters -->
+		<float   name="cel_threshold"     value="0.10"/>
+		<vector  name="shadow_tint"       value="0.4, 0.3, 0.55"/>
+		<vector  name="ambient"           value="0.06, 0.06, 0.08"/>
+		<vector  name="light_dir"         value="0.5, 0.5, -1.0"/>
+		<vector  name="light_color"       value="1.0, 1.0, 1.0"/>
+
+		<!-- Tie-Dye parameters -->
+		<vector  name="tie_dye_freq"      value="10.0, 14.0, 18.0"/>
+		<vector  name="tie_dye_phase"     value="0.0, 2.1, 4.2"/>
+
+		<!-- ACP ramp: deep indigo → hot coral -->
+		<vector  name="acp_dark_color"    value="0.08, 0.02, 0.20"/>
+		<vector  name="acp_bright_color"  value="1.0, 0.45, 0.25"/>
+
+		<vector  name="background_color"  value="0.85, 0.92, 1.0"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<string name="fovAxis" value="smaller"/>
+		<float name="nearClip" value="10"/>
+		<float name="farClip" value="2800"/>
+		<float name="focusDistance" value="1000"/>
+		<transform name="toWorld">
+			<lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="39.3077"/>
+
+		<sampler type="ldsampler">
+			<integer name="sampleCount" value="4"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="512"/>
+			<integer name="height" value="512"/>
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<!-- === Materials === -->
+
+	<!-- Golden (cel targets) -->
+	<bsdf type="diffuse" id="mat_gold">
+		<rgb name="reflectance" value="0.90, 0.70, 0.15"/>
+	</bsdf>
+
+	<!-- Emerald (tiedye targets) -->
+	<bsdf type="diffuse" id="mat_emerald">
+		<rgb name="reflectance" value="0.12, 0.65, 0.35"/>
+	</bsdf>
+
+	<!-- Coral (acp target) -->
+	<bsdf type="diffuse" id="mat_coral">
+		<rgb name="reflectance" value="0.85, 0.35, 0.30"/>
+	</bsdf>
+
+	<!-- Sky blue (cel sphere) -->
+	<bsdf type="diffuse" id="mat_sky">
+		<rgb name="reflectance" value="0.30, 0.55, 0.90"/>
+	</bsdf>
+
+	<!-- Lavender (tiedye sphere) -->
+	<bsdf type="diffuse" id="mat_lavender">
+		<rgb name="reflectance" value="0.65, 0.45, 0.80"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="white">
+		<rgb name="reflectance" value="0.73, 0.71, 0.68"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="red">
+		<rgb name="reflectance" value="0.63, 0.06, 0.04"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="green">
+		<rgb name="reflectance" value="0.15, 0.48, 0.09"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light">
+		<rgb name="reflectance" value="0.78, 0.78, 0.78"/>
+	</bsdf>
+
+	<!-- === Geometry === -->
+
+	<!-- Shape 0: area light -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_luminaire.obj"/>
+		<transform name="toWorld">
+			<translate x="0" y="-0.5" z="0"/>
+		</transform>
+		<ref id="light"/>
+		<emitter type="area">
+			<rgb name="radiance" value="17.0, 12.0, 4.0"/>
+		</emitter>
+	</shape>
+
+	<!-- Shape 1: floor -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_floor.obj"/>
+		<ref id="white"/>
+	</shape>
+	<!-- Shape 2: ceiling -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_ceiling.obj"/>
+		<ref id="white"/>
+	</shape>
+	<!-- Shape 3: back wall -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_back.obj"/>
+		<ref id="white"/>
+	</shape>
+	<!-- Shape 4: green wall -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_greenwall.obj"/>
+		<ref id="green"/>
+	</shape>
+	<!-- Shape 5: red wall -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_redwall.obj"/>
+		<ref id="red"/>
+	</shape>
+
+	<!-- Shape 6: small box → CEL -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_smallbox.obj"/>
+		<ref id="mat_gold"/>
+	</shape>
+
+	<!-- Shape 7: large box → TIEDYE -->
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_largebox.obj"/>
+		<ref id="mat_emerald"/>
+	</shape>
+
+	<!-- Shape 8: sphere (left, low) → ACP -->
+	<shape type="sphere">
+		<point name="center" x="140" y="80" z="170"/>
+		<float name="radius" value="80"/>
+		<ref id="mat_coral"/>
+	</shape>
+
+	<!-- Shape 9: sphere (right, high) → CEL -->
+	<shape type="sphere">
+		<point name="center" x="420" y="350" z="300"/>
+		<float name="radius" value="65"/>
+		<ref id="mat_sky"/>
+	</shape>
+
+	<!-- Shape 10: sphere (center, mid) → TIEDYE -->
+	<shape type="sphere">
+		<point name="center" x="278" y="160" z="350"/>
+		<float name="radius" value="70"/>
+		<ref id="mat_lavender"/>
+	</shape>
+</scene>

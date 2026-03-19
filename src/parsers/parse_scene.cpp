@@ -633,6 +633,37 @@ RenderOptions parse_integrator(pugi::xml_node node,
             } else if (name == "maxDepth" || name == "max_depth") {
                 options.max_depth = parse_integer(
                     child.attribute("value").value(), default_map);
+            } else if (name == "style_type" || name == "styleType") {
+                options.style_type = child.attribute("value").value();
+            } else if (name == "cel_ids" || name == "celIds") {
+                std::string ids_str = child.attribute("value").value();
+                std::stringstream cs(ids_str);
+                std::string ctok;
+                while (std::getline(cs, ctok, ',')) {
+                    options.cel_target_ids.push_back(std::stoi(ctok));
+                }
+            } else if (name == "tiedye_ids" || name == "tiedyeIds") {
+                std::string ids_str = child.attribute("value").value();
+                std::stringstream ts(ids_str);
+                std::string ttok;
+                while (std::getline(ts, ttok, ',')) {
+                    options.tiedye_target_ids.push_back(std::stoi(ttok));
+                }
+            } else if (name == "acp_ids" || name == "acpIds") {
+                std::string ids_str = child.attribute("value").value();
+                std::stringstream as(ids_str);
+                std::string atok;
+                while (std::getline(as, atok, ',')) {
+                    options.acp_target_ids.push_back(std::stoi(atok));
+                }
+            } else if (name == "tie_dye_freq" || name == "tieDyeFreq") {
+                options.tie_dye_freq = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "tie_dye_phase" || name == "tieDyePhase") {
+                options.tie_dye_phase = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "acp_dark_color" || name == "acpDarkColor") {
+                options.acp_dark_color = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "acp_bright_color" || name == "acpBrightColor") {
+                options.acp_bright_color = parse_vector3(child.attribute("value").value(), default_map);
             }
         }
     } else {

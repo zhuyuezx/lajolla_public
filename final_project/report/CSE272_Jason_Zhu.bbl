@@ -1,0 +1,60 @@
+\begin{thebibliography}{10}
+
+\bibitem{west2024stylized}
+Mark West.
+\newblock Stylized rendering as a function of expectation.
+\newblock {\em arXiv preprint arXiv:2408.09839}, 2024.
+
+\bibitem{gooch1998non}
+Amy Gooch, Bruce Gooch, Peter Shirley, and Elaine Cohen.
+\newblock A non-photorealistic lighting model for automatic technical
+  illustration.
+\newblock In {\em Proceedings of SIGGRAPH '98}, pages 447--452. ACM, 1998.
+
+\bibitem{li2018differentiable}
+Tzu-Mao Li, Miika Aittala, Fr{\'e}do Durand, and Jaakko Lehtinen.
+\newblock Differentiable {Monte Carlo} ray tracing through edge sampling.
+\newblock In {\em Proceedings of SIGGRAPH Asia '18}. ACM, 2018.
+
+\bibitem{lake2000stylized}
+Adam Lake, Carl Marshall, Mark Harris, and Marc Blackstein.
+\newblock Stylized rendering techniques for scalable real-time {3D} animation.
+\newblock In {\em Proceedings of NPAR '00}, pages 13--20. ACM, 2000.
+
+\bibitem{reinhard2001color}
+Erik Reinhard, Michael Adhikhmin, Bruce Gooch, and Peter Shirley.
+\newblock Color transfer between images.
+\newblock {\em IEEE Computer Graphics and Applications}, 21(5):34--41, 2001.
+
+\bibitem{kajiya1986rendering}
+James~T. Kajiya.
+\newblock The rendering equation.
+\newblock In {\em Proceedings of SIGGRAPH '86}, pages 143--150. ACM, 1986.
+
+\bibitem{obradinn2018}
+Lucas Pope.
+\newblock Return of the {Obra Dinn}.
+\newblock Video game, \url{https://obradinn.com/}, 2018.
+
+\bibitem{floyd1976adaptive}
+Robert~W. Floyd and Louis Steinberg.
+\newblock An adaptive algorithm for spatial greyscale.
+\newblock {\em Proceedings of the Society for Information Display},
+  17(2):75--77, 1976.
+
+\bibitem{kuwahara1976processing}
+M.~Kuwahara, K.~Hachimura, S.~Eiho, and M.~Kinoshita.
+\newblock Processing of {RI}-angiocardiographic images.
+\newblock {\em Digital Processing of Biomedical Images}, pages 187--203, 1976.
+
+\bibitem{litwinowicz1997processing}
+Peter Litwinowicz.
+\newblock Processing images and video for an impressionist effect.
+\newblock In {\em Proceedings of SIGGRAPH '97}, pages 407--414. ACM, 1997.
+
+\bibitem{saito1990comprehensible}
+Takafumi Saito and Tokiichiro Takahashi.
+\newblock Comprehensible rendering of {3-D} shapes.
+\newblock In {\em Proceedings of SIGGRAPH '90}, pages 197--206. ACM, 1990.
+
+\end{thebibliography}

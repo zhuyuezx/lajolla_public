@@ -187,12 +187,7 @@ result += albedo × ambient          // flat ambient
 ### Run Commands
 
 ```bash
-# Fast iteration (k=16)
 ./build/lajolla scenes/cbox/cbox_stylized.xml
-python3 final_project/sobel_post.py image.exr -o image_outlined.exr
-
-# High quality (k=256, sharp cel bands)
-./build/lajolla scenes/cbox/cbox_stylized_hi.xml
 python3 final_project/sobel_post.py image.exr -o image_outlined.exr
 ```
 
@@ -200,81 +195,159 @@ python3 final_project/sobel_post.py image.exr -o image_outlined.exr
 
 ## Pipeline 3: West's Stylized Path Tracing (Animated Transition)
 
-Extends Pipeline 2 with **object-ID-selective stylization** and a **temporal crossfade**, rendered across 60 frames with a sinusoidal camera orbit. Demonstrates that the stylization is fully integrated into the 3D renderer, not a 2D post-process.
+Extends Pipeline 2 with **object-ID-selective stylization** and a **temporal crossfade**, rendered across 60 frames with a sinusoidal camera orbit.
+
+### Key Additions over Pipeline 2
+
+- **Object-ID dispatch**: `target_object_ids` list → only selected shapes get the k-sample + g_θ treatment; others use cheap 1-sample PBR
+- **Temporal crossfade**: `transition_t` ∈ [0,1] blends `lerp(PBR, styled, t)` per pixel
+- **Camera orbit**: sinusoidal ±30° horizontal arc over 60 frames
+
+### Source Files
+
+| File | Role |
+|------|------|
+| [stylized_pt_integrator.h](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h) | Object-ID check, temporal crossfade, PBR fallback |
+| [animate_transition.py](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/animate_transition.py) | 60-frame orchestrator, XML patching, GIF assembly |
+| [cbox_transition.xml](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/scenes/cbox/cbox_transition.xml) | Gold + blue pillars, red/green walls |
+
+### Run Commands
+
+```bash
+python3 final_project/animate_transition.py \
+  --scene scenes/cbox/cbox_transition.xml \
+  --frames 60 --fps 15 --orbit 30 \
+  --output transition.gif
+```
+
+---
+
+## Pipeline 4: Multi-Style Showcase (Per-Object Dispatch + Moving Light)
+
+Extends Pipeline 3 with **three distinct style functions** assignable per-object, two new colour-based g_θ functions from West 2024 (Tie-Dye and ACP), and a **moving area light** animation demonstrating how each style responds to changing illumination in a custom open-air scene.
 
 ### Pipeline Diagram
 
 ```
-animate_transition.py (orchestrator)
+animate_gallery.py (orchestrator)
 │
 │  For each frame i = 0..59:
-│    t = i / 59              (0.0 → 1.0)
-│    camera = sin_orbit(i)   (±30° wave)
+│    light_pos = semicircular arc(i)
 │    │
 │    ▼
-│  ┌──────────────────────────────────────────┐
-│  │  Patch XML:                              │
-│  │    transition_t = t                      │
-│  │    <lookAt origin=.../>  = orbit pos     │
-│  │    <string name="filename" .../>  = exr  │
-│  └────────┬─────────────────────────────────┘
+│  ┌────────────────────────────────────────────┐
+│  │  Patch XML:                                │
+│  │    <translate x= y= z= />  = light arc    │
+│  │  Write XML in scene directory              │
+│  │    (mesh paths are relative!)              │
+│  └────────┬───────────────────────────────────┘
 │           ▼
-│  ┌──────────────────────────────────────────┐
-│  │  ./build/lajolla frame_NNNN.xml          │
-│  │                                          │
-│  │  stylized_path_tracing() per pixel:      │
-│  │    hit shape_id ∈ target_ids?            │
-│  │      NO  → 1-sample PBR (fast)           │
-│  │      YES → k-sample ⟨I⟩ then:           │
-│  │        final = lerp(PBR, Cel, t)         │
-│  └────────┬─────────────────────────────────┘
+│  ┌────────────────────────────────────────────┐
+│  │  ./build/lajolla frame.xml                 │
+│  │                                            │
+│  │  stylized_path_tracing() per pixel:        │
+│  │    style_id = get_style_for_shape(hit)     │
+│  │      0 → 1-sample PBR (non-target)         │
+│  │      1 → k-sample ⟨I⟩ → cel g_θ           │
+│  │      2 → k-sample ⟨I⟩ → tiedye g_θ        │
+│  │      3 → k-sample ⟨I⟩ → acp g_θ           │
+│  │    lerp(PBR, styled, transition_t)         │
+│  └────────┬───────────────────────────────────┘
 │           ▼
-│    frame_NNNN.exr  →  gamma correct  →  uint8
+│    frame.exr → ffmpeg sRGB → .png
 │
 ▼
-Assemble all frames → transition.gif (imageio)
+ffmpeg palettegen + paletteuse → gallery.gif
 ```
 
-### Object-ID Selective Stylization
+### Per-Object Style Dispatch
+
+Each shape is checked against three separate ID lists in priority order:
 
 ```
-Camera ray → intersect → shape_id
-
-if target_object_ids is non-empty AND shape_id NOT in target_object_ids:
-  → return stylized_inner_trace(vertex)     // single-sample PBR
-  → SKIP the k-sample loop entirely         // ~30% faster
-
-else (target object):
-  → run k-sample inner estimate ⟨I⟩
-  → compute pbr_color = ⟨I⟩
-  → compute cel_color = g_θ(albedo, ⟨I⟩)
-  → return lerp(pbr_color, cel_color, transition_t)
+get_style_for_shape(scene, shape_id):
+  if shape_id in cel_target_ids     → return CEL     (1)
+  if shape_id in tiedye_target_ids  → return TIEDYE  (2)
+  if shape_id in acp_target_ids     → return ACP     (3)
+  // Backward compat with Pipeline 3:
+  if shape_id in target_object_ids  → style_type selects (1/2/3)
+  return NONE (0)    // standard PBR
 ```
 
-### Camera Orbit
+### Style Functions
 
-Sinusoidal horizontal wave around the Cornell Box center:
+#### Cel-Shading g_θ (Pipeline 2–3, unchanged)
+
+```
+lum = luminance(⟨I⟩)
+if lum >= threshold → albedo × light_color
+else               → albedo × shadow_tint
++ ambient
+```
+
+#### Tie-Dye Cosine g_θ (West Fig 11) — [stylized_apply_tiedye](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h#248-260)
+
+Per-channel cosine waves applied to the physical radiance:
+
+```
+result.r = |cos(freq.r × ⟨I⟩.r + phase.r)|
+result.g = |cos(freq.g × ⟨I⟩.g + phase.g)|
+result.b = |cos(freq.b × ⟨I⟩.b + phase.b)|
+```
+
+Parameters: `tie_dye_freq` (Vector3), `tie_dye_phase` (Vector3)
+
+#### ACP Colour Ramp g_θ (West Fig 7) — [stylized_apply_acp](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h#269-278)
+
+Maps luminance to a two-stop colour ramp:
+
+```
+lum = clamp(luminance(⟨I⟩), 0, 1)
+result = lerp(acp_dark_color, acp_bright_color, lum)
+```
+
+Parameters: `acp_dark_color` (Vector3), `acp_bright_color` (Vector3)
+
+### Moving Light Animation
+
+The area light sweeps in a semicircular arc across 60 frames:
 
 ```python
-phase = 2π × frame / n_frames
-azimuth = base_azimuth + orbit_deg × sin(phase)
+arc_angle = π × frame / (n_frames - 1)     # 0..π
 
-origin.x = target.x + radius × sin(azimuth)
-origin.z = target.z - radius × cos(azimuth)
-origin.y = constant (same height)
+light_x = -radius × cos(arc_angle)          # left → right
+light_y = min_y + (max_y - min_y) × sin()   # low → high → low
+light_z = constant                           # behind camera
 ```
 
-Default: ±30° arc, one full sin cycle over 60 frames.
+| Frame | Position | Lighting angle |
+|-------|----------|----------------|
+| 0 | far left, low | grazing from left |
+| 30 | centred, high | overhead (top-down) |
+| 60 | far right, low | grazing from right |
+
+> [!IMPORTANT]
+> **Mesh Path Resolution:** La Jolla resolves OBJ paths relative to the **scene XML's directory**. Temp frame XMLs must be written into the scene directory (not `/tmp/`) for meshes to load.
 
 ### XML Parameters
 
 ```xml
 <integrator type="stylized_pt">
-    <integer name="inner_samples"  value="64"/>
-    <float   name="transition_t"   value="0.0"/>     <!-- patched per frame -->
-    <string  name="target_ids"     value="6,7"/>     <!-- pillar shape IDs -->
-    <float   name="cel_threshold"  value="0.10"/>
-    ...
+    <integer name="inner_samples"     value="256"/>
+    <float   name="transition_t"      value="1.0"/>
+
+    <!-- Per-object style assignment (by shape ID) -->
+    <string  name="cel_ids"           value="2,3,8"/>
+    <string  name="tiedye_ids"        value="6,7"/>
+    <string  name="acp_ids"           value="4,5,9"/>
+
+    <!-- Tie-Dye parameters -->
+    <vector  name="tie_dye_freq"      value="12.0, 16.0, 20.0"/>
+    <vector  name="tie_dye_phase"     value="0.5, 2.5, 4.5"/>
+
+    <!-- ACP parameters -->
+    <vector  name="acp_dark_color"    value="0.06, 0.02, 0.18"/>
+    <vector  name="acp_bright_color"  value="1.0, 0.50, 0.15"/>
 </integrator>
 ```
 
@@ -282,35 +355,55 @@ Default: ±30° arc, one full sin cycle over 60 frames.
 
 | File | Role |
 |------|------|
-| [stylized_pt_integrator.h](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h) | Object-ID check, temporal crossfade, PBR fallback |
-| [scene.h](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/scene.h) | [transition_t](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/animate_transition.py#91-98), `target_object_ids` in [RenderOptions](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/scene.h#26-50) |
-| [parse_scene.cpp](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/parsers/parse_scene.cpp) | Parse [transition_t](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/animate_transition.py#91-98), `target_ids` |
-| [animate_transition.py](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/animate_transition.py) | 60-frame orchestrator, XML patching, GIF assembly |
-| [cbox_transition.xml](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/scenes/cbox/cbox_transition.xml) | Colorful scene: gold + blue pillars, red/green walls |
+| [stylized_pt_integrator.h](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h) | [get_style_for_shape](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h#228-246), [stylized_apply_tiedye](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h#248-260), [stylized_apply_acp](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/stylized_pt_integrator.h#269-278) |
+| [scene.h](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/scene.h) | `cel_target_ids`, `tiedye_target_ids`, `acp_target_ids`, tie-dye/ACP params in [RenderOptions](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/scene.h#26-70) |
+| [parse_scene.cpp](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/src/parsers/parse_scene.cpp) | Parse `cel_ids`, `tiedye_ids`, `acp_ids`, tie-dye/ACP params |
+| [animate_gallery.py](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/final_project/animate_gallery.py) | Moving-light orchestrator, ffmpeg-based GIF assembly |
+| [scene.xml](file:///Users/zhuyuezx/Documents/UCSD/Winter_2025/CSE272/lajolla_public/scenes/gallery/scene.xml) | Sculpture Garden: 5 OBJ meshes + 4 spheres, open-air, per-object styles |
+
+### Sculpture Garden Scene
+
+Custom open-air scene (no Cornell Box):
+
+| Shape ID | Object | Style | Material |
+|----------|--------|-------|----------|
+| 0 | Area light (invisible) | — | — |
+| 1 | Ground plane (60×60) | PBR | Sandy stone |
+| 2 | Tall pedestal | Cel | Golden |
+| 3 | Sphere on tall pedestal | Cel | Sky blue |
+| 4 | Short pedestal | ACP | Terracotta |
+| 5 | Sphere on short pedestal | ACP | Coral |
+| 6 | Column (32-gon) | Tie-Dye | Emerald |
+| 7 | Floating orb near column | Tie-Dye | Lavender |
+| 8 | Floating orb (high) | Cel | Pearl |
+| 9 | Wide pedestal | ACP | Slate |
 
 ### Run Commands
 
 ```bash
-# Full 60-frame animation with camera orbit
-python3 final_project/animate_transition.py \
-  --scene scenes/cbox/cbox_transition.xml \
-  --frames 60 --fps 15 --orbit 30 \
-  --output transition.gif
+# Single frame (16 SPP × 256 inner, ~2.8s)
+./build/lajolla scenes/gallery/scene.xml
 
-# Single test frame (t=0, static camera)
-./build/lajolla scenes/cbox/cbox_transition.xml
+# Full animation (60 frames, moving light, ~3 min)
+python3 final_project/animate_gallery.py \
+  --scene scenes/gallery/scene.xml \
+  --frames 60 --fps 15 --output gallery.gif
 ```
 
 ---
 
 ## Comparison
 
-| | Pipeline 1: Skypop | Pipeline 2: West (Static) | Pipeline 3: West (Animated) |
-|---|---|---|---|
-| **Lighting** | Single directional | Full GI (area lights, indirect) | Full GI |
-| **Shading** | N·L + hard shadow | k-sample MC → cel step | k-sample MC → lerp(PBR, cel, t) |
-| **Bounces** | 0 (primary only) | Unlimited (Russian Roulette) | Unlimited |
-| **Color Bleed** | None | Yes (physical) | Yes (physical) |
-| **Outlines** | Sobel AOVs | Sobel AOVs | None (raw color) |
-| **Cost per pixel** | 1 ray | k × full path trace | target: k × PT; other: 1 × PT |
-| **Deterministic** | Yes | No (MC) | No (MC) |
+| | Pipeline 1: Skypop | Pipeline 2: West (Static) | Pipeline 3: West (Animated) | Pipeline 4: Multi-Style |
+|---|---|---|---|---|
+| **Lighting** | Single directional | Full GI (area lights) | Full GI | Full GI + moving light |
+| **Shading** | N·L + hard shadow | k-sample MC → cel | k-sample MC → lerp(PBR, cel, t) | k-sample MC → per-object g_θ |
+| **Style functions** | Cel only | Cel only | Cel only | Cel, Tie-Dye, ACP |
+| **Style dispatch** | Global | Global | Per-target-list | Per-object (3 lists) |
+| **Bounces** | 0 (primary only) | Unlimited (RR) | Unlimited (RR) | Unlimited (RR) |
+| **Color Bleed** | None | Yes (physical) | Yes (physical) | Yes (physical) |
+| **Outlines** | Sobel AOVs | Sobel AOVs | None | None |
+| **Scene** | Cornell Box | Cornell Box | Cornell Box | Custom (Sculpture Garden) |
+| **Animation** | Static | Static | Camera orbit + t crossfade | Moving light sweep |
+| **Cost per pixel** | 1 ray | k × path trace | target: k × PT; other: 1 × PT | target: k × PT; other: 1 × PT |
+| **Deterministic** | Yes | No (MC) | No (MC) | No (MC) |

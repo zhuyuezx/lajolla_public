@@ -211,19 +211,24 @@ static Mesh make_rock(float cx, float cz, float sx, float sy, float sz) {
   return make_box(cx, sy * 0.5f, cz, sx * 0.5f, sy * 0.5f, sz * 0.5f);
 }
 
-// Deer: body box + 4 legs + head+neck
 static Mesh make_deer(float cx, float cz) {
-  // Body at y=0.7, horizontal
-  Mesh body = make_box(cx, 0.75f, cz, 0.5f, 0.2f, 0.18f);
-  // 4 legs
+  // Body at y=1.1, horizontal (larger and taller)
+  Mesh body = make_box(cx, 1.1f, cz, 0.75f, 0.3f, 0.25f);
+
+  // 4 legs (longer and thicker)
   Mesh legs[4];
-  float lx[] = {-0.32f, 0.32f, -0.32f, 0.32f};
-  float lz[] = {-0.10f, -0.10f, 0.10f, 0.10f};
-  for (int i = 0; i < 4; i++)
-    legs[i] = make_box(cx + lx[i], 0.3f, cz + lz[i], 0.04f, 0.3f, 0.04f);
+  float lx[] = {-0.5f, 0.5f, -0.5f, 0.5f};
+  float lz[] = {-0.15f, -0.15f, 0.15f, 0.15f};
+  for (int i = 0; i < 4; i++) {
+    // Legs stretch from y=0 to y=0.9 (center at 0.45) to perfectly intersect
+    // the body
+    legs[i] = make_box(cx + lx[i], 0.45f, cz + lz[i], 0.06f, 0.45f, 0.06f);
+  }
+
   // Head + neck
-  Mesh neck = make_box(cx + 0.5f, 0.9f, cz, 0.04f, 0.15f, 0.04f);
-  Mesh head = make_box(cx + 0.55f, 1.05f, cz, 0.1f, 0.08f, 0.08f);
+  Mesh neck = make_box(cx + 0.75f, 1.4f, cz, 0.06f, 0.25f, 0.06f);
+  Mesh head = make_box(cx + 0.85f, 1.65f, cz, 0.15f, 0.12f, 0.12f);
+
   // Merge all parts into one mesh
   Mesh result = body;
   Mesh parts[] = {legs[0], legs[1], legs[2], legs[3], neck, head};
@@ -248,12 +253,12 @@ static Mesh make_deer(float cx, float cz) {
 
 // Crow: tiny dark box on the ground, optionally bobbing
 static Mesh make_crow(float cx, float cz, float y_off) {
-  // Body
-  Mesh body = make_box(cx, 0.12f + y_off, cz, 0.08f, 0.05f, 0.05f);
+  // Body (sits right on the ground at baseline)
+  Mesh body = make_box(cx, 0.1f + y_off, cz, 0.16f, 0.1f, 0.1f);
   // Head (shifted slightly forward and up)
-  Mesh head = make_box(cx + 0.10f, 0.18f + y_off, cz, 0.04f, 0.04f, 0.04f);
+  Mesh head = make_box(cx + 0.20f, 0.26f + y_off, cz, 0.08f, 0.08f, 0.08f);
   // Beak (shifted further forward from the head, thinner)
-  Mesh beak = make_box(cx + 0.16f, 0.18f + y_off, cz, 0.03f, 0.015f, 0.015f);
+  Mesh beak = make_box(cx + 0.32f, 0.26f + y_off, cz, 0.06f, 0.03f, 0.03f);
 
   // Merge parts
   Mesh result = body;
@@ -277,7 +282,82 @@ static Mesh make_crow(float cx, float cz, float y_off) {
   return result;
 }
 
-// ─── Embree scene ────────────────────────────────────────────────────────────
+// ─── Mesh rotation helpers ───────────────────────────────────────────────────
+
+// Rotate vertices around a pivot on the YZ plane (for limb swing)
+static Mesh rotate_mesh_x(Mesh m, float pivot_y, float pivot_z, float angle) {
+  float ca = cosf(angle), sa = sinf(angle);
+  for (int i = 0; i < m.nv; i++) {
+    float y = m.verts[i * 4 + 1] - pivot_y;
+    float z = m.verts[i * 4 + 2] - pivot_z;
+    m.verts[i * 4 + 1] = y * ca - z * sa + pivot_y;
+    m.verts[i * 4 + 2] = y * sa + z * ca + pivot_z;
+  }
+  return m;
+}
+
+// Rotate vertices around Y axis (for character facing direction)
+static Mesh rotate_mesh_y(Mesh m, float angle) {
+  float ca = cosf(angle), sa = sinf(angle);
+  for (int i = 0; i < m.nv; i++) {
+    float x = m.verts[i * 4];
+    float z = m.verts[i * 4 + 2];
+    m.verts[i * 4] = x * ca + z * sa;
+    m.verts[i * 4 + 2] = -x * sa + z * ca;
+  }
+  return m;
+}
+
+// Helper to merge mesh B into mesh A
+static void merge_mesh(Mesh &dst, const Mesh &src) {
+  int base = dst.nv;
+  for (int i = 0; i < src.nv; i++) {
+    dst.verts.push_back(src.verts[i * 4]);
+    dst.verts.push_back(src.verts[i * 4 + 1]);
+    dst.verts.push_back(src.verts[i * 4 + 2]);
+    dst.verts.push_back(0);
+  }
+  for (int i = 0; i < src.nt; i++) {
+    dst.tris.push_back(src.tris[i * 3] + base);
+    dst.tris.push_back(src.tris[i * 3 + 1] + base);
+    dst.tris.push_back(src.tris[i * 3 + 2] + base);
+  }
+  dst.nv += src.nv;
+  dst.nt += src.nt;
+}
+
+// ─── Procedural animated player ──────────────────────────────────────────────
+static Mesh make_player(float anim_time, bool is_moving) {
+  float swing = is_moving ? sinf(anim_time * 15.0f) * 0.6f : 0.0f;
+
+  // Torso (center of character)
+  Mesh torso = make_box(0, 0.7f, 0, 0.18f, 0.22f, 0.12f);
+  // Head
+  Mesh head = make_box(0, 1.15f, 0, 0.12f, 0.12f, 0.10f);
+
+  // Legs — pivot at hip_y=0.5
+  float hip_y = 0.5f;
+  Mesh left_leg = make_box(-0.10f, 0.25f, 0, 0.06f, 0.25f, 0.06f);
+  Mesh right_leg = make_box(0.10f, 0.25f, 0, 0.06f, 0.25f, 0.06f);
+  left_leg = rotate_mesh_x(left_leg, hip_y, 0, swing);
+  right_leg = rotate_mesh_x(right_leg, hip_y, 0, -swing);
+
+  // Arms — pivot at shoulder_y=0.9
+  float shoulder_y = 0.9f;
+  Mesh left_arm = make_box(-0.28f, 0.65f, 0, 0.05f, 0.20f, 0.05f);
+  Mesh right_arm = make_box(0.28f, 0.65f, 0, 0.05f, 0.20f, 0.05f);
+  left_arm = rotate_mesh_x(left_arm, shoulder_y, 0, -swing);
+  right_arm = rotate_mesh_x(right_arm, shoulder_y, 0, swing);
+
+  // Merge all 6 parts
+  Mesh player = torso;
+  merge_mesh(player, head);
+  merge_mesh(player, left_leg);
+  merge_mesh(player, right_leg);
+  merge_mesh(player, left_arm);
+  merge_mesh(player, right_arm);
+  return player;
+}
 struct ObjEntry {
   Vec3 color;
 };
@@ -312,8 +392,6 @@ static const TreePlace TREES[] = {
     {4, -2, 0},    {-3.5f, -4, 1}, {3, -6, 2},   {-6, 3, 0},  {6, 4, 2}};
 static constexpr int N_TREES = sizeof(TREES) / sizeof(TREES[0]);
 
-static Mesh g_char_template;
-
 // Pond placement
 struct PondPlace {
   float x, z, r;
@@ -345,7 +423,8 @@ static const float CROW_POS[][2] = {{-3, 8},  {15, 3},   {-20, -5},
                                     {7, -12}, {-12, 22}, {30, 18}};
 static constexpr int N_CROW = sizeof(CROW_POS) / sizeof(CROW_POS[0]);
 
-static void build_scene(Vec3 char_pos, float anim_time, bool is_moving) {
+static void build_scene(Vec3 char_pos, float anim_time, bool is_moving,
+                        float char_yaw) {
   if (g_scene)
     rtcReleaseScene(g_scene);
   g_scene = rtcNewScene(g_device);
@@ -437,21 +516,11 @@ static void build_scene(Vec3 char_pos, float anim_time, bool is_moving) {
     g_colors.push_back({crow_col});
   }
 
-  // Character with bob & wobble
-  Mesh cm = g_char_template;
-  if (is_moving) {
-    float bob_y = fabsf(sinf(anim_time * 12.f)) * 0.08f;
-    float roll = sinf(anim_time * 12.f) * 0.06f; // subtle Z-roll
-    for (int i = 0; i < cm.nv; i++) {
-      float y = cm.verts[i * 4 + 1];
-      float x = cm.verts[i * 4];
-      // Apply roll rotation around character center
-      cm.verts[i * 4] = x * cosf(roll) - y * sinf(roll);
-      cm.verts[i * 4 + 1] = x * sinf(roll) + y * cosf(roll) + bob_y;
-    }
-  }
-  cm = translate_mesh(cm, char_pos);
-  register_mesh(cm);
+  // Character — procedural with scissor-walk and yaw facing
+  Mesh player = make_player(anim_time, is_moving);
+  player = rotate_mesh_y(player, char_yaw);
+  player = translate_mesh(player, char_pos);
+  register_mesh(player);
   g_colors.push_back({{0.88f, 0.72f, 0.58f}});
 
   rtcCommitScene(g_scene);
@@ -562,9 +631,8 @@ int main(int argc, char **argv) {
   if (argc > 1)
     mesh_dir = argv[1];
 
-  g_char_template = load_obj(mesh_dir + "/character.obj");
-  // Trees are now fully procedural — no OBJ loading needed
-  printf("Loaded meshes from %s\n", mesh_dir.c_str());
+  // Character is now fully procedural — no OBJ loading needed
+  printf("Initialized scene (procedural assets)\n");
 
   // Init Embree
   g_device = rtcNewDevice(nullptr);
@@ -597,10 +665,13 @@ int main(int argc, char **argv) {
   float cam_radius = 7.8f;
   const float CAM_SPEED = 0.03f;
 
+  // Character facing direction
+  float char_yaw = 0.0f;
+
   // Initial build + render
   float anim_time = 0.f;
   bool is_moving = false;
-  build_scene(char_pos, anim_time, false);
+  build_scene(char_pos, anim_time, false, char_yaw);
   Camera cam = make_camera(char_pos, cam_azimuth, cam_altitude, cam_radius);
   render_frame(cam, fb.data());
   bool needs_render = false;
@@ -646,10 +717,10 @@ int main(int argc, char **argv) {
     // Arrow keys: move character relative to camera direction
     Vec3 old_pos = char_pos;
     if (keys[SDL_SCANCODE_RIGHT]) {
-      char_pos = char_pos + move_right * MOVE_SPEED;
+      char_pos = char_pos - move_right * MOVE_SPEED;
     }
     if (keys[SDL_SCANCODE_LEFT]) {
-      char_pos = char_pos - move_right * MOVE_SPEED;
+      char_pos = char_pos + move_right * MOVE_SPEED;
     }
     if (keys[SDL_SCANCODE_UP]) {
       char_pos = char_pos + move_fwd * MOVE_SPEED;
@@ -664,8 +735,12 @@ int main(int argc, char **argv) {
     char_pos.z = std::max(-lim, std::min(lim, char_pos.z));
 
     is_moving = (char_pos.x != old_pos.x || char_pos.z != old_pos.z);
-    if (is_moving)
+    if (is_moving) {
+      // Update character yaw to face movement direction
+      Vec3 mv = {char_pos.x - old_pos.x, 0.f, char_pos.z - old_pos.z};
+      char_yaw = atan2f(mv.x, mv.z);
       needs_render = true;
+    }
 
     // Advance animation time (for crow bobbing + player bob)
     anim_time += 0.016f; // ~60fps tick
@@ -677,7 +752,7 @@ int main(int argc, char **argv) {
     }
 
     if (needs_render) {
-      build_scene(char_pos, anim_time, is_moving);
+      build_scene(char_pos, anim_time, is_moving, char_yaw);
       cam = make_camera(char_pos, cam_azimuth, cam_altitude, cam_radius);
       render_frame(cam, fb.data());
       needs_render = false;

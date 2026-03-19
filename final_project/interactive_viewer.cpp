@@ -57,10 +57,15 @@ static float clampf(float v, float lo, float hi) {
 // ─── Unlit + Fog settings (Deer Hunter II / Sokpop savanna) ──────────────────
 // Sun almost straight down → high noon, minimal lateral shadows
 static const Vec3 LIGHT_DIR = vnorm({0.1f, 1.0f, 0.15f});
-static constexpr float SHADOW_MULT = 0.85f;          // very soft pastel shadows
-static const Vec3 SKY_COLOR = {0.95f, 0.89f, 0.71f}; // pale warm peach sky
-static constexpr float FOG_MIN = 15.f; // fog starts at this distance
-static constexpr float FOG_MAX = 70.f; // fully fogged at this distance
+// HARSHER contrast. Dropping from 0.85 to 0.60 makes shadows much darker,
+// selling the "bright sun" illusion.
+static constexpr float SHADOW_MULT = 0.60f;
+// Blinding, bleached hot-sand sky color
+static const Vec3 SKY_COLOR = {0.98f, 0.92f, 0.70f};
+// Push the fog way back. This removes the "misty" feel and turns it into
+// distant heat haze.
+static constexpr float FOG_MIN = 35.f;
+static constexpr float FOG_MAX = 120.f;
 
 // ─── Simple mesh ─────────────────────────────────────────────────────────────
 struct Mesh {
@@ -243,7 +248,33 @@ static Mesh make_deer(float cx, float cz) {
 
 // Crow: tiny dark box on the ground, optionally bobbing
 static Mesh make_crow(float cx, float cz, float y_off) {
-  return make_box(cx, 0.12f + y_off, cz, 0.12f, 0.06f, 0.08f);
+  // Body
+  Mesh body = make_box(cx, 0.12f + y_off, cz, 0.08f, 0.05f, 0.05f);
+  // Head (shifted slightly forward and up)
+  Mesh head = make_box(cx + 0.10f, 0.18f + y_off, cz, 0.04f, 0.04f, 0.04f);
+  // Beak (shifted further forward from the head, thinner)
+  Mesh beak = make_box(cx + 0.16f, 0.18f + y_off, cz, 0.03f, 0.015f, 0.015f);
+
+  // Merge parts
+  Mesh result = body;
+  Mesh parts[] = {head, beak};
+  for (auto &p : parts) {
+    int base = result.nv;
+    for (int i = 0; i < p.nv; i++) {
+      result.verts.push_back(p.verts[i * 4]);
+      result.verts.push_back(p.verts[i * 4 + 1]);
+      result.verts.push_back(p.verts[i * 4 + 2]);
+      result.verts.push_back(0);
+    }
+    for (int i = 0; i < p.nt; i++) {
+      result.tris.push_back(p.tris[i * 3] + base);
+      result.tris.push_back(p.tris[i * 3 + 1] + base);
+      result.tris.push_back(p.tris[i * 3 + 2] + base);
+    }
+    result.nv += p.nv;
+    result.nt += p.nt;
+  }
+  return result;
 }
 
 // ─── Embree scene ────────────────────────────────────────────────────────────
@@ -325,7 +356,7 @@ static void build_scene(Vec3 char_pos, float anim_time, bool is_moving) {
   // Ground
   Mesh ground = make_ground(GROUND_HALF, 0.4f);
   register_mesh(ground);
-  g_colors.push_back({{0.99f, 0.88f, 0.60f}});
+  g_colors.push_back({{0.96f, 0.85f, 0.55f}});
 
   // Trees — fully procedural (no OBJ loading)
   Vec3 trunk_col = {0.55f, 0.40f, 0.28f};
@@ -663,7 +694,8 @@ int main(int argc, char **argv) {
       float fps = 1000.f / std::max(1u, now - last_tick);
       char title[128];
       snprintf(title, sizeof(title),
-               "Unlit Fog — pos(%.1f,%.1f) az=%.1f° — %.0f FPS — WASD orbit / Arrows move",
+               "Unlit Fog — pos(%.1f,%.1f) az=%.1f° — %.0f FPS — WASD orbit / "
+               "Arrows move",
                char_pos.x, char_pos.z, cam_azimuth * 57.3f, fps);
       SDL_SetWindowTitle(win, title);
       last_tick = now;

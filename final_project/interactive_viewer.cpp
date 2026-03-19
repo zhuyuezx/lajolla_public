@@ -443,21 +443,26 @@ static void build_scene(Vec3 char_pos, float anim_time, bool is_moving,
       {0.45f, 0.58f, 0.38f}, {0.50f, 0.60f, 0.35f}, {0.40f, 0.55f, 0.42f}};
   for (int i = 0; i < N_TREES; i++) {
     float tx = TREES[i].x, tz = TREES[i].z;
-    // Vary trunk height (8–12) and canopy radius (4–6) per tree
-    float th = 8.f + (i % 5) * 1.0f;
-    float cr = 4.f + (i % 3) * 1.0f;
-    // Trunk: tall thin box
-    Mesh trunk = make_box(tx, th * 0.5f, tz, 0.4f, th * 0.5f, 0.4f);
+
+    // HALVED: Trunk height now (4–6) and canopy radius (2–3)
+    float th = 4.f + (i % 5) * 0.5f;
+    float cr = 2.f + (i % 3) * 0.5f;
+
+    // Trunk: tall thin box (made slightly thinner to match new height)
+    Mesh trunk = make_box(tx, th * 0.5f, tz, 0.25f, th * 0.5f, 0.25f);
     register_mesh(trunk);
     g_colors.push_back({trunk_col});
+
     // Canopy: 3 overlapping massive boxes at top of trunk
     float cy = th + cr * 0.4f;
     Mesh c1 = make_box(tx, cy, tz, cr, cr * 0.5f, cr * 0.8f);
     register_mesh(c1);
     g_colors.push_back({canopy_cols[TREES[i].type % 3]});
+
     Mesh c2 = make_box(tx, cy + 0.4f, tz, cr * 0.8f, cr * 0.55f, cr);
     register_mesh(c2);
     g_colors.push_back({canopy_cols[TREES[i].type % 3]});
+
     Mesh c3 = make_box(tx, cy - 0.3f, tz, cr * 0.6f, cr * 0.45f, cr * 0.6f);
     register_mesh(c3);
     g_colors.push_back({canopy_cols[TREES[i].type % 3]});

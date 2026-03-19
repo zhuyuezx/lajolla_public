@@ -8,6 +8,7 @@
 #include "progress_reporter.h"
 #include "scene.h"
 #include "../final_project/npr_integrator.h"
+#include "../final_project/stylized_pt_integrator.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -172,6 +173,22 @@ Image3 render(const Scene &scene) {
         Image3 color = npr_render(scene, aovs);
 
         // Write AOVs next to the main output file
+        fs::path out_path(scene.output_filename);
+        fs::path dir  = out_path.parent_path();
+        std::string stem = out_path.stem().string();
+        std::string ext  = out_path.extension().string();
+        if (dir.empty()) dir = ".";
+
+        imwrite((dir / (stem + "_depth"    + ext)).string(), aovs.depth);
+        imwrite((dir / (stem + "_normal"   + ext)).string(), aovs.normal);
+        imwrite((dir / (stem + "_objectid" + ext)).string(), aovs.object_id);
+
+        return color;
+    } else if (scene.options.integrator == Integrator::StylizedPT) {
+        NprAovs aovs;
+        Image3 color = stylized_pt_render(scene, aovs);
+
+        // Write AOVs next to the main output file (same pattern as NPR)
         fs::path out_path(scene.output_filename);
         fs::path dir  = out_path.parent_path();
         std::string stem = out_path.stem().string();

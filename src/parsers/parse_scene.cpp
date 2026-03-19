@@ -601,6 +601,27 @@ RenderOptions parse_integrator(pugi::xml_node node,
                 options.npr_background_color = parse_vector3(child.attribute("value").value(), default_map);
             }
         }
+    } else if (type == "stylized_pt") {
+        options.integrator = Integrator::StylizedPT;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "inner_samples" || name == "innerSamples") {
+                options.stylized_inner_samples = parse_integer(
+                    child.attribute("value").value(), default_map);
+            } else if (name == "lightDir" || name == "light_dir") {
+                options.npr_light_dir = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "lightColor" || name == "light_color") {
+                options.npr_light_color = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "ambient") {
+                options.npr_ambient = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "shadowTint" || name == "shadow_tint") {
+                options.npr_shadow_tint = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "celThreshold" || name == "cel_threshold") {
+                options.npr_cel_threshold = parse_float(child.attribute("value").value(), default_map);
+            } else if (name == "backgroundColor" || name == "background_color") {
+                options.npr_background_color = parse_vector3(child.attribute("value").value(), default_map);
+            }
+        }
     } else {
         Error(std::string("Unsupported integrator: ") + type);
     }

@@ -19,7 +19,8 @@ enum class Integrator {
     MipmapLevel,
     Path,
     VolPath,
-    NPR  // Non-Photorealistic Rendering (cel-shaded, flat, isometric)
+    NPR,        // Non-Photorealistic Rendering (cel-shaded, flat, isometric)
+    StylizedPT  // West 2024: g_θ(⟨I⟩) — style function on inner MC estimate
 };
 
 struct RenderOptions {
@@ -40,6 +41,9 @@ struct RenderOptions {
     Vector3 npr_shadow_tint      = Vector3{Real(0.5),  Real(0.5),  Real(0.6)};  // cool shadow
     Real    npr_cel_threshold    = Real(0.1);           // N·L threshold
     Vector3 npr_background_color = Vector3{Real(0.8),  Real(0.9),  Real(1.0)};  // sky/miss color
+
+    // --- Stylized PT (West 2024) options ---
+    int stylized_inner_samples = 16;  // k inner MC samples for ⟨I⟩ estimate
 };
 
 /// Bounding sphere

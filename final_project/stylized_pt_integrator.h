@@ -216,10 +216,22 @@ static Spectrum stylized_apply_g_theta(const Scene &scene,
 }
 
 // ---------------------------------------------------------------------------
+// Helper: check if shape_id is in the target list
+// ---------------------------------------------------------------------------
+static bool is_target_object(const Scene &scene, int shape_id) {
+    const auto &ids = scene.options.target_object_ids;
+    for (int id : ids) {
+        if (id == shape_id) return true;
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------
 // Main per-pixel stylized path tracing function.
 //
-// At depth 0 (camera ray): compute k-sample inner MC estimate ⟨I⟩, then
-// apply g_θ (cel step).  All inner bounces use standard physical PT.
+// Object-ID parameterized:
+//   - Non-target shapes → 1-sample PBR (cheap)
+//   - Target shapes     → k-sample inner estimate + g_θ with Y-sweep transition
 // ---------------------------------------------------------------------------
 static Spectrum stylized_path_tracing(const Scene &scene,
                                       int x, int y,
@@ -232,7 +244,6 @@ static Spectrum stylized_path_tracing(const Scene &scene,
 
     std::optional<PathVertex> vertex_ = intersect(scene, ray, ray_diff);
     if (!vertex_) {
-        // Miss → background / envmap
         if (has_envmap(scene)) {
             return emission(get_envmap(scene), -ray.dir, ray_diff.spread,
                             PointAndNormal{}, scene);
@@ -240,9 +251,15 @@ static Spectrum stylized_path_tracing(const Scene &scene,
         return fromRGB(scene.options.npr_background_color);
     }
     PathVertex vertex = *vertex_;
+    Vector3 dir_view = -ray.dir;
 
-    // ---- FIRST-HIT ONLY: depth == 0 → stylized ----
-    // Extract surface albedo for the style function
+    // --- Non-target object: standard single-sample PBR ---
+    if (!scene.options.target_object_ids.empty() &&
+        !is_target_object(scene, vertex.shape_id)) {
+        return stylized_inner_trace(scene, vertex, dir_view, ray_diff, rng);
+    }
+
+    // --- Target object: k-sample inner estimate ---
     Spectrum albedo = make_const_spectrum(Real(0.8));
     if (vertex.material_id >= 0) {
         const Material &mat = scene.materials[vertex.material_id];
@@ -250,11 +267,8 @@ static Spectrum stylized_path_tracing(const Scene &scene,
         albedo = eval(tex, vertex.uv, vertex.uv_screen_size, scene.texture_pool);
     }
 
-    // k-sample inner MC estimate ⟨I⟩
     int k = scene.options.stylized_inner_samples;
     Spectrum inner_sum = make_zero_spectrum();
-    Vector3 dir_view = -ray.dir;
-
     for (int s = 0; s < k; s++) {
         Spectrum sample_rad = stylized_inner_trace(
             scene, vertex, dir_view, ray_diff, rng);
@@ -264,8 +278,22 @@ static Spectrum stylized_path_tracing(const Scene &scene,
     }
     Spectrum averaged_radiance = inner_sum / Real(k);
 
-    // Apply style function g_θ to the averaged estimate
-    return stylized_apply_g_theta(scene, albedo, averaged_radiance);
+    // --- Temporal crossfade: t blends uniformly between PBR and cel ---
+    Real t = scene.options.transition_t;
+
+    // t >= 1.0 → full cel
+    if (scene.options.target_object_ids.empty() || t >= Real(1)) {
+        return stylized_apply_g_theta(scene, albedo, averaged_radiance);
+    }
+    // t <= 0 → full PBR
+    if (t <= Real(0)) {
+        return averaged_radiance;
+    }
+
+    // Uniform blend: lerp(PBR, Cel, t)
+    Spectrum pbr_color = averaged_radiance;
+    Spectrum cel_color = stylized_apply_g_theta(scene, albedo, averaged_radiance);
+    return pbr_color * (Real(1) - t) + cel_color * t;
 }
 
 // ---------------------------------------------------------------------------

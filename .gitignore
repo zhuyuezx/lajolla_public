@@ -55,3 +55,6 @@ build/
 **/*.gif
 **/*.mov
 .cache/*
+
+# .DS_Store
+**/.DS_Store

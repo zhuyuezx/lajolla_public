@@ -620,6 +620,19 @@ RenderOptions parse_integrator(pugi::xml_node node,
                 options.npr_cel_threshold = parse_float(child.attribute("value").value(), default_map);
             } else if (name == "backgroundColor" || name == "background_color") {
                 options.npr_background_color = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "transition_t" || name == "transitionT") {
+                options.transition_t = parse_float(child.attribute("value").value(), default_map);
+            } else if (name == "target_ids" || name == "targetIds") {
+                // Parse comma-separated integer list e.g. "6,7"
+                std::string ids_str = child.attribute("value").value();
+                std::stringstream ss(ids_str);
+                std::string tok;
+                while (std::getline(ss, tok, ',')) {
+                    options.target_object_ids.push_back(std::stoi(tok));
+                }
+            } else if (name == "maxDepth" || name == "max_depth") {
+                options.max_depth = parse_integer(
+                    child.attribute("value").value(), default_map);
             }
         }
     } else {

@@ -44,6 +44,8 @@ struct RenderOptions {
 
     // --- Stylized PT (West 2024) options ---
     int stylized_inner_samples = 16;  // k inner MC samples for ⟨I⟩ estimate
+    Real transition_t = Real(0);      // 0.0 = full PBR, 1.0 = full cel on targets
+    std::vector<int> target_object_ids; // shape IDs to stylize (others stay PBR)
 };
 
 /// Bounding sphere

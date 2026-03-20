@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.2.1)  19 MAR 2026 19:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.2.1)  19 MAR 2026 22:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -571,12 +571,12 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 
 {/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map}]
-<../imgs/p1_viewer_front.png, id=160, 642.4pt x 481.8pt>
+<../imgs/p1_viewer_front.png, id=162, 642.4pt x 481.8pt>
 File: ../imgs/p1_viewer_front.png Graphic file (type png)
 <use ../imgs/p1_viewer_front.png>
 Package pdftex.def Info: ../imgs/p1_viewer_front.png  used on input line 79.
 (pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
-<../imgs/p4_gallery_light060.png, id=161, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light060.png, id=163, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light060.png Graphic file (type png)
 <use ../imgs/p4_gallery_light060.png>
 Package pdftex.def Info: ../imgs/p4_gallery_light060.png  used on input line 84.
@@ -603,31 +603,31 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 [3]
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 244.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 243.
  (/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 
 [4]
-<../imgs/p2_obra_dinn.png, id=238, 2509.375pt x 1138.2525pt>
+<../imgs/p2_obra_dinn.png, id=242, 2509.375pt x 1138.2525pt>
 File: ../imgs/p2_obra_dinn.png Graphic file (type png)
 <use ../imgs/p2_obra_dinn.png>
-Package pdftex.def Info: ../imgs/p2_obra_dinn.png  used on input line 288.
+Package pdftex.def Info: ../imgs/p2_obra_dinn.png  used on input line 287.
 (pdftex.def)             Requested size: 190.79109pt x 86.52893pt.
-<../imgs/p2_toon.png, id=239, 963.6pt x 1284.8pt>
+<../imgs/p2_toon.png, id=243, 963.6pt x 1284.8pt>
 File: ../imgs/p2_toon.png Graphic file (type png)
 <use ../imgs/p2_toon.png>
-Package pdftex.def Info: ../imgs/p2_toon.png  used on input line 293.
+Package pdftex.def Info: ../imgs/p2_toon.png  used on input line 292.
 (pdftex.def)             Requested size: 190.79109pt x 254.38727pt.
-<../imgs/p2_oil.png, id=240, 1712.3975pt x 1284.8pt>
+<../imgs/p2_oil.png, id=244, 1712.3975pt x 1284.8pt>
 File: ../imgs/p2_oil.png Graphic file (type png)
 <use ../imgs/p2_oil.png>
-Package pdftex.def Info: ../imgs/p2_oil.png  used on input line 298.
+Package pdftex.def Info: ../imgs/p2_oil.png  used on input line 297.
 (pdftex.def)             Requested size: 190.79109pt x 143.13203pt.
-<../imgs/p2_painterly.png, id=241, 1712.3975pt x 1284.8pt>
+<../imgs/p2_painterly.png, id=245, 1712.3975pt x 1284.8pt>
 File: ../imgs/p2_painterly.png Graphic file (type png)
 <use ../imgs/p2_painterly.png>
-Package pdftex.def Info: ../imgs/p2_painterly.png  used on input line 303.
+Package pdftex.def Info: ../imgs/p2_painterly.png  used on input line 302.
 (pdftex.def)             Requested size: 190.79109pt x 143.13203pt.
 
 
@@ -635,55 +635,55 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 File: ../imgs/p1_viewer_front.png Graphic file (type png)
 <use ../imgs/p1_viewer_front.png>
-Package pdftex.def Info: ../imgs/p1_viewer_front.png  used on input line 317.
+Package pdftex.def Info: ../imgs/p1_viewer_front.png  used on input line 316.
 (pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
-<../imgs/p1_viewer_close.png, id=243, 642.4pt x 481.8pt>
+<../imgs/p1_viewer_close.png, id=247, 642.4pt x 481.8pt>
 File: ../imgs/p1_viewer_close.png Graphic file (type png)
 <use ../imgs/p1_viewer_close.png>
-Package pdftex.def Info: ../imgs/p1_viewer_close.png  used on input line 322.
+Package pdftex.def Info: ../imgs/p1_viewer_close.png  used on input line 321.
 (pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<../imgs/p3_transition_t000.png, id=246, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t000.png, id=250, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t000.png Graphic file (type png)
 <use ../imgs/p3_transition_t000.png>
-Package pdftex.def Info: ../imgs/p3_transition_t000.png  used on input line 336.
+Package pdftex.def Info: ../imgs/p3_transition_t000.png  used on input line 335.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t002.png, id=247, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t002.png, id=251, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t002.png Graphic file (type png)
 <use ../imgs/p3_transition_t002.png>
-Package pdftex.def Info: ../imgs/p3_transition_t002.png  used on input line 340.
+Package pdftex.def Info: ../imgs/p3_transition_t002.png  used on input line 339.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t004.png, id=248, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t004.png, id=252, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t004.png Graphic file (type png)
 <use ../imgs/p3_transition_t004.png>
-Package pdftex.def Info: ../imgs/p3_transition_t004.png  used on input line 344.
+Package pdftex.def Info: ../imgs/p3_transition_t004.png  used on input line 343.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t008.png, id=249, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t008.png, id=253, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t008.png Graphic file (type png)
 <use ../imgs/p3_transition_t008.png>
-Package pdftex.def Info: ../imgs/p3_transition_t008.png  used on input line 348.
+Package pdftex.def Info: ../imgs/p3_transition_t008.png  used on input line 347.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t016.png, id=250, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t016.png, id=254, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t016.png Graphic file (type png)
 <use ../imgs/p3_transition_t016.png>
-Package pdftex.def Info: ../imgs/p3_transition_t016.png  used on input line 353.
+Package pdftex.def Info: ../imgs/p3_transition_t016.png  used on input line 352.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t032.png, id=251, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t032.png, id=255, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t032.png Graphic file (type png)
 <use ../imgs/p3_transition_t032.png>
-Package pdftex.def Info: ../imgs/p3_transition_t032.png  used on input line 357.
+Package pdftex.def Info: ../imgs/p3_transition_t032.png  used on input line 356.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t064.png, id=252, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t064.png, id=256, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t064.png Graphic file (type png)
 <use ../imgs/p3_transition_t064.png>
-Package pdftex.def Info: ../imgs/p3_transition_t064.png  used on input line 361.
+Package pdftex.def Info: ../imgs/p3_transition_t064.png  used on input line 360.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
-<../imgs/p3_transition_t100.png, id=253, 642.4pt x 481.8pt>
+<../imgs/p3_transition_t100.png, id=257, 642.4pt x 481.8pt>
 File: ../imgs/p3_transition_t100.png Graphic file (type png)
 <use ../imgs/p3_transition_t100.png>
-Package pdftex.def Info: ../imgs/p3_transition_t100.png  used on input line 365.
+Package pdftex.def Info: ../imgs/p3_transition_t100.png  used on input line 364.
 (pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
@@ -691,34 +691,34 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 [5]
-<../imgs/p4_gallery_light000.png, id=263, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light000.png, id=267, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light000.png Graphic file (type png)
 <use ../imgs/p4_gallery_light000.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light000.png  used on input line 379.
+Package pdftex.def Info: ../imgs/p4_gallery_light000.png  used on input line 378.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
-<../imgs/p4_gallery_light020.png, id=264, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light020.png, id=268, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light020.png Graphic file (type png)
 <use ../imgs/p4_gallery_light020.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light020.png  used on input line 383.
+Package pdftex.def Info: ../imgs/p4_gallery_light020.png  used on input line 382.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
-<../imgs/p4_gallery_light040.png, id=265, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light040.png, id=269, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light040.png Graphic file (type png)
 <use ../imgs/p4_gallery_light040.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light040.png  used on input line 387.
+Package pdftex.def Info: ../imgs/p4_gallery_light040.png  used on input line 386.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
 File: ../imgs/p4_gallery_light060.png Graphic file (type png)
 <use ../imgs/p4_gallery_light060.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light060.png  used on input line 392.
+Package pdftex.def Info: ../imgs/p4_gallery_light060.png  used on input line 391.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
-<../imgs/p4_gallery_light080.png, id=266, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light080.png, id=270, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light080.png Graphic file (type png)
 <use ../imgs/p4_gallery_light080.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light080.png  used on input line 396.
+Package pdftex.def Info: ../imgs/p4_gallery_light080.png  used on input line 395.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
-<../imgs/p4_gallery_light100.png, id=267, 642.4pt x 481.8pt>
+<../imgs/p4_gallery_light100.png, id=271, 642.4pt x 481.8pt>
 File: ../imgs/p4_gallery_light100.png Graphic file (type png)
 <use ../imgs/p4_gallery_light100.png>
-Package pdftex.def Info: ../imgs/p4_gallery_light100.png  used on input line 400.
+Package pdftex.def Info: ../imgs/p4_gallery_light100.png  used on input line 399.
 (pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
 
 
@@ -739,15 +739,15 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 [8 <../imgs/p4_gallery_light000.png> <../imgs/p4_gallery_light020.png> <../imgs/p4_gallery_light040.png> <../imgs/p4_gallery_light080.png> <../imgs/p4_gallery_light100.png>] (CSE272_Jason_Zhu.bbl
 
 [9]
-Underfull \hbox (badness 3471) in paragraph at lines 57--62
+Underfull \hbox (badness 3471) in paragraph at lines 62--67
 []\T1/ptm/m/n/10 (+20) Sokpop Collective.  Deer hunter II.  Video game, []$\T1/cmtt/m/n/10 https : / / sokpop . itch . io /
  []
 
 )
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 522.
-
 
 [10]
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 521.
+
 
 [11]
 
@@ -757,20 +757,20 @@ LaTeX2e <2024-11-01> patch level 1
 L3 programming layer <2024-12-25>
  ***********
 Package rerunfilecheck Info: File `CSE272_Jason_Zhu.out' has not changed.
-(rerunfilecheck)             Checksum: 97C5DDD58E0A2AA1CBED6C16E5749A9E;6276.
+(rerunfilecheck)             Checksum: 1D6C9B5262053C77ADB65C1C3A2AC463;6338.
  ) 
 Here is how much of TeX's memory you used:
- 17733 strings out of 475472
- 285557 string characters out of 2764329
- 1362722 words of memory out of 3000000
- 40058 multiletter control sequences out of 15000+600000
- 602415 words of font info for 237 fonts, out of 8000000 for 9000
+ 17722 strings out of 475472
+ 285500 string characters out of 2764329
+ 1229722 words of memory out of 3000000
+ 40061 multiletter control sequences out of 15000+600000
+ 601385 words of font info for 227 fonts, out of 8000000 for 9000
  0 hyphenation exceptions out of 8191
- 75i,10n,79p,1227b,2042s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 75i,10n,79p,1310b,2042s stack positions out of 5000i,500n,10000p,200000b,80000s
  </Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt0900.pk>{/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/base/8r.enc} </Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt1000.pk></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmbx10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmex10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi7.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi9.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr5.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr7.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr9.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy6.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/symbols/msbm10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmb8a.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmr8a.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmri8a.pfb>
-Output written on CSE272_Jason_Zhu.pdf (12 pages, 10638800 bytes).
+Output written on CSE272_Jason_Zhu.pdf (12 pages, 10639380 bytes).
 PDF statistics:
- 621 PDF objects out of 1000 (max. 8388607)
- 169 named destinations out of 1000 (max. 500000)
+ 624 PDF objects out of 1000 (max. 8388607)
+ 170 named destinations out of 1000 (max. 500000)
  44397 words of extra memory for PDF output out of 51595 (max. 10000000)
 

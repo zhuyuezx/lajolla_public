@@ -1,9 +1,9 @@
 \begin{thebibliography}{10}
 
 \bibitem{west2024stylized}
-Mark West.
+Rex West and Sayan Mukherjee.
 \newblock Stylized rendering as a function of expectation.
-\newblock {\em arXiv preprint arXiv:2408.09839}, 2024.
+\newblock {\em ACM Transactions on Graphics (TOG)}, 43(4):Article 96, 2024.
 
 \bibitem{gooch1998non}
 Amy Gooch, Bruce Gooch, Peter Shirley, and Elaine Cohen.
@@ -26,6 +26,11 @@ Adam Lake, Carl Marshall, Mark Harris, and Marc Blackstein.
 Erik Reinhard, Michael Adhikhmin, Bruce Gooch, and Peter Shirley.
 \newblock Color transfer between images.
 \newblock {\em IEEE Computer Graphics and Applications}, 21(5):34--41, 2001.
+
+\bibitem{doi2021global}
+K.~Doi, Yuki Morimoto, and R.~Tsuruno.
+\newblock Global illumination-aware stylised shading.
+\newblock {\em Computer Graphics Forum}, 40(10):11--20, 2021.
 
 \bibitem{floyd1976adaptive}
 Robert~W. Floyd and Louis Steinberg.
@@ -56,7 +61,7 @@ Peter Litwinowicz.
 \bibitem{sokpop2019deerhunter}
 {Sokpop Collective}.
 \newblock Deer hunter~{II}.
-\newblock Video game, \url{https://sokpop.itch.io/deer-hunter-2}, 2019.
+\newblock Video game, \url{https://sokpop.itch.io/deer-hunter-ii}, 2019.
 \newblock Sokpop Collective indie game featuring a distinctive low-poly unlit
   aesthetic with cast ground shadows and linear distance fog.
 

@@ -12,9 +12,10 @@ Amy Gooch, Bruce Gooch, Peter Shirley, and Elaine Cohen.
 \newblock In {\em Proceedings of SIGGRAPH '98}, pages 447--452. ACM, 1998.
 
 \bibitem{li2018differentiable}
-Tzu-Mao Li, Miika Aittala, Fr{\'e}do Durand, and Jaakko Lehtinen.
-\newblock Differentiable {Monte Carlo} ray tracing through edge sampling.
-\newblock In {\em Proceedings of SIGGRAPH Asia '18}. ACM, 2018.
+Tzu-Mao Li.
+\newblock La~jolla: A physically-based renderer.
+\newblock \url{https://github.com/BachiLi/lajolla_public}, 2023.
+\newblock Open-source educational path tracer.
 
 \bibitem{lake2000stylized}
 Adam Lake, Carl Marshall, Mark Harris, and Marc Blackstein.
@@ -26,21 +27,21 @@ Erik Reinhard, Michael Adhikhmin, Bruce Gooch, and Peter Shirley.
 \newblock Color transfer between images.
 \newblock {\em IEEE Computer Graphics and Applications}, 21(5):34--41, 2001.
 
-\bibitem{kajiya1986rendering}
-James~T. Kajiya.
-\newblock The rendering equation.
-\newblock In {\em Proceedings of SIGGRAPH '86}, pages 143--150. ACM, 1986.
+\bibitem{floyd1976adaptive}
+Robert~W. Floyd and Louis Steinberg.
+\newblock An adaptive algorithm for spatial greyscale.
+\newblock {\em Proceedings of the Society for Information Display},
+  17(2):75--77, 1976.
 
 \bibitem{obradinn2018}
 Lucas Pope.
 \newblock Return of the {Obra Dinn}.
 \newblock Video game, \url{https://obradinn.com/}, 2018.
 
-\bibitem{floyd1976adaptive}
-Robert~W. Floyd and Louis Steinberg.
-\newblock An adaptive algorithm for spatial greyscale.
-\newblock {\em Proceedings of the Society for Information Display},
-  17(2):75--77, 1976.
+\bibitem{saito1990comprehensible}
+Takafumi Saito and Tokiichiro Takahashi.
+\newblock Comprehensible rendering of {3-D} shapes.
+\newblock In {\em Proceedings of SIGGRAPH '90}, pages 197--206. ACM, 1990.
 
 \bibitem{kuwahara1976processing}
 M.~Kuwahara, K.~Hachimura, S.~Eiho, and M.~Kinoshita.
@@ -52,9 +53,16 @@ Peter Litwinowicz.
 \newblock Processing images and video for an impressionist effect.
 \newblock In {\em Proceedings of SIGGRAPH '97}, pages 407--414. ACM, 1997.
 
-\bibitem{saito1990comprehensible}
-Takafumi Saito and Tokiichiro Takahashi.
-\newblock Comprehensible rendering of {3-D} shapes.
-\newblock In {\em Proceedings of SIGGRAPH '90}, pages 197--206. ACM, 1990.
+\bibitem{sokpop2019deerhunter}
+{Sokpop Collective}.
+\newblock Deer hunter~{II}.
+\newblock Video game, \url{https://sokpop.itch.io/deer-hunter-2}, 2019.
+\newblock Sokpop Collective indie game featuring a distinctive low-poly unlit
+  aesthetic with cast ground shadows and linear distance fog.
+
+\bibitem{kajiya1986rendering}
+James~T. Kajiya.
+\newblock The rendering equation.
+\newblock In {\em Proceedings of SIGGRAPH '86}, pages 143--150. ACM, 1986.
 
 \end{thebibliography}

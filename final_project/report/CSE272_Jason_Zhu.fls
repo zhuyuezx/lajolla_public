@@ -149,6 +149,23 @@ INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/late
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/caption/caption.sty
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/caption/caption3.sty
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/caption/caption3.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/listings.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/listings.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstpatch.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstpatch.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstpatch.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/listings.cfg
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/listings.cfg
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/listings.cfg
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstlang1.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstlang1.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstlang1.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/listings/lstmisc.sty
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/l3backend/l3backend-pdftex.def
 INPUT ./CSE272_Jason_Zhu.aux
@@ -205,20 +222,9 @@ INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tf
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8t.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmb8t.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmri8t.tfm
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
-INPUT ../imgs/p4_gallery_light060.png
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx10.tfm
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx7.tfm
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx5.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmb8t.vf
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmb8r.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map
@@ -232,15 +238,26 @@ INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/vf
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmri8r.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmr8t.vf
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8r.tfm
-INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx10.tfm
-INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx7.tfm
-INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmbx5.tfm
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
+INPUT ../imgs/p4_gallery_light060.png
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8t.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8t.tfm
-INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/jknappen/ec/ectt0800.tfm
-INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/jknappen/ec/ectt0800.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmr8t.vf
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8r.tfm
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/jknappen/ec/ectt0800.tfm
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/jknappen/ec/ectt0800.tfm
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ts1ptm.fd
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ts1ptm.fd
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ts1ptm.fd
@@ -274,6 +291,17 @@ INPUT ../imgs/p2_painterly.png
 INPUT ../imgs/p2_painterly.png
 INPUT ../imgs/p2_painterly.png
 INPUT ../imgs/p2_painterly.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_front.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
+INPUT ../imgs/p1_viewer_close.png
 INPUT ../imgs/p3_transition_t000.png
 INPUT ../imgs/p3_transition_t000.png
 INPUT ../imgs/p3_transition_t000.png
@@ -383,23 +411,15 @@ INPUT ../imgs/p4_gallery_light100.png
 INPUT ../imgs/p4_gallery_light100.png
 INPUT ../imgs/p4_gallery_light100.png
 INPUT ../imgs/p4_gallery_light100.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_front.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
-INPUT ../imgs/p1_viewer_close.png
 INPUT ./CSE272_Jason_Zhu.bbl
 INPUT ./CSE272_Jason_Zhu.bbl
 INPUT CSE272_Jason_Zhu.bbl
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/jknappen/ec/ectt0900.tfm
 INPUT CSE272_Jason_Zhu.aux
 INPUT ./CSE272_Jason_Zhu.out
 INPUT ./CSE272_Jason_Zhu.out
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt0900.pk
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt0900.pk
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/base/8r.enc
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt1000.pk
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/ectt1000.pk
@@ -427,6 +447,8 @@ INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/ty
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy6.pfb
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7.pfb
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7.pfb
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/symbols/msbm10.pfb
+INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/symbols/msbm10.pfb
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmb8a.pfb
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmb8a.pfb
 INPUT /Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmr8a.pfb

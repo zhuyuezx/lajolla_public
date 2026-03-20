@@ -64,6 +64,10 @@ struct RenderOptions {
     // ACP (Artistic Color Palette) ramp endpoints
     Vector3 acp_dark_color   = Vector3{Real(0.05), Real(0.0), Real(0.15)};  // deep purple
     Vector3 acp_bright_color = Vector3{Real(1.0),  Real(0.85), Real(0.3)};  // warm gold
+
+    // --- Advanced estimator options (Section 6.3) ---
+    bool use_halton_sampling = false;  // Use Halton QMC instead of PCG for inner-k loop
+    bool use_chebyshev_cel   = false;  // Use Chebyshev polynomial approximation for cel step
 };
 
 /// Bounding sphere

@@ -17,9 +17,21 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{subcaption}
+\usepackage{listings}
 
-\title{Stylized Rendering as a Function of Expectation:\\
-  Implementation and Extension in La~Jolla}
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  language=XML,
+  morekeywords={scene,integrator,integer,float,string,sensor,transform,lookAt,film,shape,bsdf,emitter,translate},
+}
+
+\title{Beyond Post-Processing: Multi-Style Path Tracing and Per-Object Dispatch in La~Jolla}
 
 \author{%
   Yuezhexuan Zhu \\
@@ -36,7 +48,7 @@
 %%  ABSTRACT
 %% ═══════════════════════════════════════════════════════════════
 \begin{abstract}
-We present an implementation and extension of West's~\cite{west2024stylized} framework for stylized rendering as a function of expectation within the La~Jolla physically-based renderer. Starting from a deterministic cel-shading pipeline (\textbf{Pipeline~1}), we progressively build toward a Monte~Carlo--based stylization system that applies non-linear style functions $g_\theta$ to per-pixel radiance estimates (\textbf{Pipeline~2}). We then add object-selective stylization with temporal crossfade (\textbf{Pipeline~3}) and culminate in a \textbf{multi-style showcase} (\textbf{Pipeline~4}) featuring per-object dispatch of three distinct style functions---cel-shading, tie-dye cosine mapping, and artistic colour palette (ACP)---demonstrated in a custom open-air \emph{Sculpture Garden} scene with animated lighting. Our results demonstrate that stylization applied to the \emph{expectation} of Monte~Carlo transport yields aesthetically coherent effects with physically grounded illumination, including global illumination, soft shadows, and colour bleeding.
+We present an implementation and extension of West's~\cite{west2024stylized} framework for stylized rendering as a function of expectation within the La~Jolla physically-based renderer. We begin with a suite of 2D image-space NPR post-processing effects as a baseline (\textbf{Pipeline~1}), then implement a real-time unlit renderer inspired by the Sokpop Collective's Deer Hunter~II aesthetic (\textbf{Pipeline~2}). Building on these foundations, we develop a deterministic cel-shading integrator (\textbf{Pipeline~3}) and culminate in a \textbf{multi-style Monte~Carlo showcase} (\textbf{Pipeline~4}) featuring per-object dispatch of three distinct style functions---cel-shading, tie-dye cosine mapping, and artistic colour palette (ACP)---demonstrated in a custom open-air \emph{Sculpture Garden} scene with animated lighting. Our results demonstrate that stylization applied to the \emph{expectation} of Monte~Carlo transport yields aesthetically coherent effects with physically grounded illumination, including global illumination, soft shadows, and colour bleeding.
 \end{abstract}
 
 
@@ -50,22 +62,22 @@ Non-photorealistic rendering (NPR) has a long history in computer graphics, from
 
 West~\cite{west2024stylized} proposes an elegant alternative: apply a \emph{non-linear style function} $g_\theta$ to the Monte~Carlo \emph{expectation} of physically based radiance at each pixel. Because the style function operates on the converged estimate $\langle I \rangle$ rather than individual samples, the resulting image inherits full global illumination (GI) effects—soft shadows, colour bleeding, caustics—while exhibiting the desired artistic look.
 
-In this project, we implement and extend this framework within the La~Jolla renderer~\cite{li2018differentiable} across four progressively more capable pipelines:
+In this project, we implement and extend this framework within the La~Jolla renderer~\cite{li2018differentiable} across four pipelines:
 
 \begin{enumerate}
-    \item \textbf{Pipeline~1} (Skypop NPR): Deterministic cel-shading with Sobel-based outlines. Single directional light, zero bounces.
-    \item \textbf{Pipeline~2} (West Static): $k$-sample Monte~Carlo estimate $\langle I \rangle$ with a cel-shading $g_\theta$. Full GI.
-    \item \textbf{Pipeline~3} (West Animated): Object-ID--selective stylization with temporal crossfade $t \in [0,1]$, animated camera orbit.
+    \item \textbf{Pipeline~1} (Post-Processing NPR): 2D image-space effects including Obra~Dinn--style 1-bit ordered dithering, toon/cel quantisation, and Kuwahara-based painterly rendering.
+    \item \textbf{Pipeline~2} (Deer Hunter~II Viewer): A real-time unlit flat-albedo renderer with cast ground shadows and linear distance fog, built on Embree~4 and SDL2.
+    \item \textbf{Pipeline~3} (Deterministic Cel-Shading): A single-directional-light cel-shading integrator with hard $\mathbf{N} \cdot \mathbf{L}$ shadow threshold and $k$-sample Monte~Carlo transition.
     \item \textbf{Pipeline~4} (Multi-Style Showcase): Per-object dispatch of three style functions (cel, tie-dye, ACP) in a custom \emph{Sculpture Garden} scene with a sweeping area light.
 \end{enumerate}
 
-Our primary contributions are: (a)~a clean implementation of West's stylization framework in La~Jolla, (b)~a per-object style dispatch mechanism enabling heterogeneous styles in a single render, and (c)~a custom open-air scene with animated lighting that demonstrates the interplay between physically based illumination and stylistic colour transformations.
+Our primary contributions are: (a)~a practical implementation of West's stylization framework in La~Jolla, (b)~a per-object style dispatch mechanism enabling heterogeneous styles in a single render, and (c)~a custom open-air scene with animated lighting that demonstrates the viability of applying physically based illumination alongside stylistic colour transformations.
 
 \begin{figure}[h]
     \centering
     \begin{subfigure}[b]{0.48\linewidth}
         \includegraphics[width=\linewidth]{../imgs/p1_viewer_front.png}
-        \caption{Deer Hunter II savanna scene (Pipeline~1)}
+        \caption{Deer Hunter II savanna scene (Pipeline~2)}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\linewidth}
@@ -92,7 +104,18 @@ West~\cite{west2024stylized} formalises the idea of applying a style function $g
 \paragraph{Artistic colour palettes.}
 Colour mapping and palette-based rendering have been explored in the context of image stylization~\cite{reinhard2001color}. West~\cite{west2024stylized} demonstrates two such mappings: a per-channel cosine ``tie-dye'' effect and a luminance-based Artistic Colour Palette (ACP) ramp, both of which we implement in Pipeline~4.
 
-% TODO: Add more related work as needed (e.g., halftone rendering, painterly rendering)
+\paragraph{Image-space post-processing NPR.}
+A long-standing alternative to integrated NPR is to apply stylistic effects directly to a finished image.
+Ordered dithering using Bayer matrices~\cite{floyd1976adaptive} converts a greyscale image to a binary pattern that simulates tone gradations, and was famously exploited by Pope's \emph{Return of the Obra Dinn}~\cite{obradinn2018} to achieve a striking 1-bit aesthetic.
+Saito and Takahashi~\cite{saito1990comprehensible} introduced G-buffer--based outline extraction via depth and normal discontinuity detection, enabling clean silhouette rendering from a rasterised frame.
+For painterly effects, Kuwahara et al.~\cite{kuwahara1976processing} proposed the anisotropic smoothing filter that replaces each pixel with the mean of its lowest-variance neighbour quadrant, producing blocky oil-paint strokes.
+Litwinowicz~\cite{litwinowicz1997processing} extended this by overlaying oriented brush strokes aligned to image gradients, achieving impressionist-style videos.
+Our Pipeline~1 (Section~\ref{sec:postproc}) implements all of these techniques as a 2D post-processing baseline, motivating the move to 3D-integrated stylization in Pipelines~3--4.
+
+\paragraph{Low-poly and indie NPR aesthetics.}
+A distinct strand of applied NPR has emerged in independent game development, where resource constraints motivate deliberate stylization as an aesthetic choice rather than an approximation.
+The Sokpop Collective~\cite{sokpop2019deerhunter} exemplifies this approach in \emph{Deer Hunter~II}: low-polygon geometry is rendered with unlit flat albedo, binary ground shadows, and linear distance fog to produce a cohesive, immediately recognisable aesthetic.
+This \emph{unlit rendering} paradigm---which deliberately foregoes physically based illumination in favour of artistic coherence---differs fundamentally from the Monte~Carlo stylization approach of West~\cite{west2024stylized}, and serves as a practical reference point for Pipeline~2 of our system.
 
 
 %% ═══════════════════════════════════════════════════════════════
@@ -139,21 +162,21 @@ where $T_b$ is the path throughput at bounce $b$, $w_1, w_2$ are MIS weights, an
 
 We implement three style functions, each corresponding to a different visual effect from West~\cite{west2024stylized}.
 
-\subsubsection{Cel-Shading (Pipeline 1--4)}
+\subsubsection{Cel-Shading (Pipelines 3--4)}
 \label{sec:cel}
 
 A hard-threshold quantisation of luminance into lit and shadow bands:
 \begin{equation}
     g_{\text{cel}}(\rho, \langle I \rangle) = 
     \begin{cases}
-        \rho \cdot \mathbf{c}_{\text{light}} + \rho \cdot \mathbf{c}_{\text{ambient}} & \text{if } \text{lum}(\langle I \rangle) \geq \tau \\
-        \rho \cdot \mathbf{c}_{\text{shadow}} + \rho \cdot \mathbf{c}_{\text{ambient}} & \text{otherwise}
+        \rho \cdot \mathbf{c}_{\text{light\_tint}} + \rho \cdot \mathbf{c}_{\text{ambient}} & \text{if } \text{lum}(\langle I \rangle) \geq \tau \\
+        \rho \cdot \mathbf{c}_{\text{shadow\_tint}} + \rho \cdot \mathbf{c}_{\text{ambient}} & \text{otherwise}
     \end{cases}
     \label{eq:cel}
 \end{equation}
-where $\tau$ is the cel threshold, $\mathbf{c}_{\text{light}}$ and $\mathbf{c}_{\text{shadow}}$ are the light and shadow tint colours, and $\text{lum}(\cdot)$ computes the luminance of a colour vector.
+where $\tau$ is the cel threshold (\texttt{cel\_threshold}), $\mathbf{c}_{\text{light\_tint}}$ and $\mathbf{c}_{\text{shadow\_tint}}$ are the per-XML light and shadow tint colours (\texttt{cel\_light\_tint}, \texttt{cel\_shadow\_tint}), and $\text{lum}(\cdot)$ computes the luminance of a colour vector.
 
-\paragraph{Mollification effect.} At low $k$, variance in $\langle I \rangle$ causes pixels near $\tau$ to stochastically flip between lit and shadow, producing a soft, anti-aliased boundary. At high $k$, the estimate converges and the boundary becomes sharp. This is the super-linear convergence property described in West~\cite{west2024stylized} \S3.2.
+\paragraph{Mollification effect.} At low $k$, variance in $\langle I \rangle$ causes pixels near $\tau$ to stochastically flip between lit and shadow, producing a soft, anti-aliased boundary. At high $k$, the estimate converges and the boundary becomes sharp. This is the super-linear convergence property described in West~\cite{west2024stylized} \S4.4.
 
 \subsubsection{Tie-Dye Cosine Effect (Pipeline 4)}
 \label{sec:tiedye}
@@ -163,6 +186,7 @@ A psychedelic colour mapping using per-channel cosine waves (West~\cite{west2024
     g_{\text{tiedye}}(\langle I \rangle)_c = \bigl|\cos\!\bigl(\nu_c \cdot \langle I \rangle_c + \phi_c\bigr)\bigr|, \qquad c \in \{r, g, b\}
     \label{eq:tiedye}
 \end{equation}
+(Eq.~\ref{eq:tiedye})
 where $\nu_c$ and $\phi_c$ are the per-channel frequency and phase parameters. Because the cosine operates on the physical radiance, the resulting colour pattern is modulated by global illumination—shadows, reflections, and colour bleeding all produce different hues.
 
 \subsubsection{Artistic Colour Palette / ACP (Pipeline 4)}
@@ -179,7 +203,7 @@ This maps all pixels to a two-stop gradient, creating a limited-palette illustra
 \subsection{Per-Object Style Dispatch}
 \label{sec:dispatch}
 
-A key extension beyond West's original framework is our per-object style dispatch mechanism. Rather than applying a single $g_\theta$ to all objects, we assign each shape a style via three separate ID lists parsed from the scene XML:
+Rather than applying a single $g_\theta$ to all objects, we assign each shape a style via three separate ID lists parsed from the scene XML:
 
 \begin{equation}
     \text{style}(\texttt{shape\_id}) = 
@@ -218,18 +242,22 @@ All pipelines are implemented within the La~Jolla physically-based renderer~\cit
 
 \begin{itemize}
     \item \texttt{stylized\_pt\_integrator.h}: Core integrator with inner trace, style functions, per-object dispatch, and temporal crossfade.
-    \item \texttt{npr\_integrator.h}: Deterministic cel-shading integrator (Pipeline~1) with AOV output.
+    \item \texttt{npr\_integrator.h}: Deterministic cel-shading integrator (Pipeline~3) with AOV output.
     \item \texttt{scene.h}: Extended \texttt{RenderOptions} struct with per-style ID lists and style parameters.
     \item \texttt{parse\_scene.cpp}: XML parsing for \texttt{cel\_ids}, \texttt{tiedye\_ids}, \texttt{acp\_ids}, and associated parameters.
 \end{itemize}
 
-\paragraph{Post-processing baseline.}
+\paragraph{Post-processing baseline (Pipeline~1).}
 \label{sec:postproc}
-Before implementing Monte~Carlo stylisation (Pipelines~2--4), we developed a suite of 2D NPR post-processing techniques as a baseline. These operate on finished images and serve as a point of comparison for the 3D-integrated approach: (1)~Bayer ordered dithering in the style of \emph{Return of the Obra Dinn}~\cite{obradinn2018,floyd1976adaptive}, converting images to a two-colour palette; (2)~screen-space toon/cel quantisation that snaps luminance into $B$ discrete bands; (3)~Kuwahara-based painterly rendering~\cite{kuwahara1976processing} with optional Litwinowicz-style~\cite{litwinowicz1997processing} oriented brush strokes; and (4)~Sobel outline post-processing~\cite{saito1990comprehensible} using G-buffer--based 4-connected neighbour comparison on depth, normal, and object-ID AOV buffers.
+Before implementing the 3D-integrated pipelines, we developed a suite of 2D NPR post-processing techniques as a baseline. These operate on finished images and serve as a point of comparison: (1)~Bayer ordered dithering in the style of \emph{Return of the Obra Dinn}~\cite{obradinn2018,floyd1976adaptive}, converting images to a two-colour palette; (2)~screen-space toon/cel quantisation that snaps luminance into $B$ discrete bands; (3)~Kuwahara-based painterly rendering~\cite{kuwahara1976processing} with optional Litwinowicz-style~\cite{litwinowicz1997processing} oriented brush strokes; and (4)~Sobel outline post-processing~\cite{saito1990comprehensible} using G-buffer--based 4-connected neighbour comparison on depth, normal, and object-ID AOV buffers.
 
-\subsection{Monte Carlo Stylization (Pipelines 2--4)}
+\subsection{Deer Hunter~II Viewer (Pipeline~2)}
 
-Pipelines~2 and~3 use the $k$-sample inner trace (Eq.~\ref{eq:inner_trace}) with full path tracing: NEE, BSDF sampling, MIS, and Russian roulette. Pipeline~3 adds object-ID filtering (Eq.~\ref{eq:dispatch}) and the temporal crossfade (Eq.~\ref{eq:crossfade}). Pipeline~4 extends the dispatch to three simultaneous style functions in a custom \emph{Sculpture Garden} scene with animated lighting.
+Pipeline~2 is a standalone real-time viewer built with Embree~4 and SDL2, reproducing the aesthetic of the Sokpop Collective's \emph{Deer Hunter~II}~\cite{sokpop2019deerhunter}. The scene is fully procedural: a savanna with low-poly trees, ponds with reeds, rocks, deer, crows, and an animated player character. Rendering uses unlit flat albedo with binary cast ground shadows and linear distance fog fading to a warm sky colour.
+
+\subsection{Monte Carlo Stylization (Pipelines 3--4)}
+
+Pipeline~3 uses a deterministic single-directional-light integrator with hard $\mathbf{N} \cdot \mathbf{L}$ cel-shading (Eq.~\ref{eq:cel}), and extends to $k$-sample Monte~Carlo estimates with temporal crossfade (Eq.~\ref{eq:crossfade}). Pipeline~4 adds per-object style dispatch (Eq.~\ref{eq:dispatch}) of three simultaneous style functions in the Sculpture Garden scene (Section~\ref{sec:scene}).
 
 \subsection{Sculpture Garden Scene}
 \label{sec:scene}
@@ -250,7 +278,7 @@ where $R$ is the sweep radius, $y_{\min}$/$y_{\max}$ define the height range, an
 \section{Results}
 \label{sec:results}
 
-\subsection{Post-Processing Baseline}
+\subsection{Post-Processing Baseline (Pipeline~1)}
 
 Figure~\ref{fig:postproc} shows representative outputs from the 2D NPR post-processing pipeline applied to personal photographs.
 
@@ -275,8 +303,27 @@ Figure~\ref{fig:postproc} shows representative outputs from the 2D NPR post-proc
         \includegraphics[width=\linewidth]{../imgs/p2_painterly.png}
         \caption{Litwinowicz brush strokes}
     \end{subfigure}
-    \caption{Post-processing NPR baseline applied to UCSD campus photographs. These 2D image-space effects are blind to 3D geometry and illumination, motivating the Monte~Carlo--integrated approach in Pipelines~2--4.}
+    \caption{Pipeline~1: Post-processing NPR baseline applied to UCSD campus photographs. These 2D image-space effects are blind to 3D geometry and illumination, motivating the 3D-integrated approach in Pipelines~3--4.}
     \label{fig:postproc}
+\end{figure}
+
+\subsection{Deer Hunter~II Viewer (Pipeline~2)}
+
+Figure~\ref{fig:viewer} shows two angles from the real-time interactive Embree-based viewer, demonstrating the unlit flat-albedo rendering with cast ground shadows and linear distance fog---matching the Sokpop Collective / Deer Hunter~II aesthetic.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p1_viewer_front.png}
+        \caption{Default camera}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p1_viewer_close.png}
+        \caption{Close-up view}
+    \end{subfigure}
+    \caption{Pipeline~2: Deer Hunter~II savanna scene rendered with our Embree-based interactive viewer. The procedural low-poly world features a player character, deer, crows, trees, ponds with reeds, and rocks---all rendered with unlit albedo, binary ground shadows, and linear distance fog fading to a warm sky.}
+    \label{fig:viewer}
 \end{figure}
 
 \subsection{PBR-to-Cel Transition (Pipeline~3)}
@@ -318,7 +365,7 @@ Figure~\ref{fig:transition} shows the temporal crossfade (Eq.~\ref{eq:crossfade}
         \includegraphics[width=\linewidth]{../imgs/p3_transition_t100.png}
         \caption{$t = 100\%$}
     \end{subfigure}
-    \caption{PBR-to-cel transition sequence. The two coloured boxes (gold and blue) in the Cornell Box are the stylization targets. At low $t$ the scene is photorealistic with GI; at high $t$ the boxes exhibit hard cel-shading boundaries while retaining colour bleeding from the walls.}
+    \caption{Pipeline~3: PBR-to-cel transition sequence. The two coloured boxes in the Cornell Box are the stylization targets. At low $t$ the scene is photorealistic with GI; at high $t$ the boxes exhibit hard cel-shading boundaries while retaining colour bleeding from the walls.}
     \label{fig:transition}
 \end{figure}
 
@@ -353,27 +400,8 @@ Figure~\ref{fig:light_sweep} shows six frames from the animated light sweep acro
         \includegraphics[width=\linewidth]{../imgs/p4_gallery_light100.png}
         \caption{$180^\circ$ (right grazing)}
     \end{subfigure}
-    \caption{Six frames from the light-sweep animation across the Sculpture Garden. Objects display cel-shading (left pedestal/sphere), tie-dye (column/top orb), and ACP (right pedestals/sphere). Shadows rotate and each style function reacts distinctly to the changing illumination.}
+    \caption{Pipeline~4: Six frames from the light-sweep animation across the Sculpture Garden. Objects display cel-shading (left pedestal/sphere), tie-dye (column/top orb), and ACP (right pedestals/sphere). Shadows rotate and each style function reacts distinctly to the changing illumination.}
     \label{fig:light_sweep}
-\end{figure}
-
-\subsection{Deer Hunter II Viewer}
-
-Figure~\ref{fig:viewer} shows two angles from the real-time interactive Embree-based viewer, demonstrating the unlit flat-albedo rendering with cast ground shadows and linear distance fog---matching the Sokpop Collective / Deer Hunter~II aesthetic.
-
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}[b]{0.48\linewidth}
-        \includegraphics[width=\linewidth]{../imgs/p1_viewer_front.png}
-        \caption{Default camera}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.48\linewidth}
-        \includegraphics[width=\linewidth]{../imgs/p1_viewer_close.png}
-        \caption{Close-up view}
-    \end{subfigure}
-    \caption{Deer Hunter~II savanna scene rendered with our Embree-based interactive viewer. The procedural low-poly world features a player character, deer, crows, trees, ponds with reeds, and rocks---all rendered with unlit albedo, binary ground shadows, and linear distance fog fading to a warm sky.}
-    \label{fig:viewer}
 \end{figure}
 
 \subsection{Performance}
@@ -386,33 +414,95 @@ Figure~\ref{fig:viewer} shows two angles from the real-time interactive Embree-b
         \toprule
         Pipeline & SPP & Inner $k$ & Style & Time (s) \\
         \midrule
-        1 (Skypop NPR) & 1 & --- & Cel (deterministic) & $\sim$0.05 \\
-        2 (West Static) & 4 & 128 & Cel & $\sim$0.45 \\
-        3 (West Animated) & 4 & 128 & Cel (selective) & $\sim$0.35 \\
+        1 (Post-Processing) & --- & --- & Image-space & $<$0.5 \\
+        2 (Deer Hunter~II) & 1 & --- & Unlit + shadow & $\sim$0.02 \\
+        3 (Deterministic Cel) & 1--16 & 128 & Cel (selective) & $\sim$0.35 \\
         4 (Multi-Style) & 16 & 256 & Cel/Tiedye/ACP & $\sim$2.8 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-Pipeline~1 is effectively instantaneous due to its deterministic single-ray evaluation. Pipelines~2--3 scale linearly with $k$. Pipeline~4 uses higher $k$ (256) and SPP (16) for quality renders; non-target objects remain cheap (1-sample PBR fallback).
+Pipeline~1 runs in Python as an offline post-process. Pipeline~2 is real-time ($>$50~fps) due to its simple unlit evaluation. Pipeline~3 scales linearly with $k$. Pipeline~4 uses higher $k$ (256) and SPP (16) for quality renders; non-target objects remain cheap (1-sample PBR fallback).
 
 
 %% ═══════════════════════════════════════════════════════════════
-%%  6. DISCUSSION & FUTURE WORK
+%%  6. DISCUSSION AND LIMITATIONS
 %% ═══════════════════════════════════════════════════════════════
-\section{Discussion and Future Work}
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\subsection{Performance vs.~Visual Trade-offs}
+
+West~\cite{west2024stylized} notes that style functions can be parameterised by object ID, making per-object stylization a natural extension of the framework.
+Our contribution in this regard is primarily a performance one: we leverage the per-object parameterisation to aggressively cull the $k$-sample inner trace for non-target geometry, falling back to a single-sample PBR evaluation for all other shapes.
+This yields an asymptotic cost bounded to $\mathcal{O}(k)$ per styled pixel, circumventing the $\mathcal{O}(k^d)$ exponential overhead that would arise from recursive application of $g_\theta$ at each bounce $d$.
+
+This choice imposes a corresponding visual limitation: indirect light paths encountering a styled surface are not themselves stylized.
+For example, a stylized object reflected in a planar mirror would appear in standard PBR rather than in cel-shading, because the mirror bounce sees the surface as a non-first-hit vertex and uses the 1-sample fallback.
+In practice, however, this first-hit restriction produces natural visual cohesion: stylized objects interact with the surrounding PBR environment as if they were physical, casting accurate colour bleed and receiving correct indirect illumination, without the combinatorial sampling cost of recursive stylization.
+For the animated sequences in Section~\ref{sec:results}, this trade-off makes 60-frame renders tractable on a single desktop CPU.
+
+\subsection{Global Illumination and Energy Conservation}
+
+Non-linear style functions fundamentally break physical energy conservation.
+Cel-shading (Eq.~\ref{eq:cel}) injects ambient energy regardless of incident illumination; tie-dye (Eq.~\ref{eq:tiedye}) maps radiance to arbitrary cosine values that may exceed the incident energy; and ACP (Eq.~\ref{eq:acp}) maps all pixels to a fixed colour ramp, discarding physical luminance relationships.
+
+Because our pipeline computes genuine global illumination in the inner traces, styled objects act as de-facto emitters within the scene: GI-correct colour bleeding from a cel-shaded object tints the surrounding diffuse geometry with the object's stylized hue rather than its physical albedo.
+This is aesthetically pleasing in moderate scenes, but West~\cite{west2024stylized} notes a structural danger: if energy-increasing styles are applied recursively across all bounces, the path integral can geometrically diverge, producing runaway brightness.
+Our first-hit-only restriction acts as a natural safeguard against this divergence, since indirect paths never accumulate additional stylized energy additions beyond the first camera vertex.
+
+\subsection{Estimator Variance and Mollification}
+
+Our cel-shading implementation uses the \emph{biased direct application} estimator: the discontinuous step function $g_{\text{cel}}$ (Eq.~\ref{eq:cel}) is applied directly to the finite-sample inner estimate $\langle I \rangle_k$.
+Because $\langle I \rangle_k$ has residual variance $\sigma^2 / k$, pixels whose true radiance $I^*$ lies near the threshold $\tau$ stochastically classify as lit or shadowed, producing a blurred boundary instead of a sharp step---the \emph{mollification} effect.
+The mollification width scales as $\sim\!\sigma / \sqrt{k}$, meaning that suppressing it purely by increasing $k$ is computationally expensive.
+Importantly, this estimator is \emph{biased}: $\mathbb{E}[g_\theta(\langle I \rangle_k)] \neq g_\theta(\mathbb{E}[\langle I \rangle_k])$ when $g_\theta$ is non-linear, and the bias does not vanish at any finite $k$.
+
+The ACP style function (Eq.~\ref{eq:acp}) suffers comparatively little from this artefact.
+Being a linear interpolation, its curvature is identically zero, so variance in $\langle I \rangle_k$ produces only gradual colour drift rather than stochastic binary flipping.
+This makes ACP a more suitable default style for animated sequences where temporal coherence is important.
+
+
+%% ═══════════════════════════════════════════════════════════════
+%%  7. FUTURE WORK
+%% ═══════════════════════════════════════════════════════════════
+\section{Future Work}
 \label{sec:future}
 
-% TODO: Fill in discussion and future work
+\subsection{Low-Discrepancy Sampling}
+
+Our current inner-trace loop draws $k$ independent samples using a PCG pseudo-random number generator, resulting in sample clumping and a variance of $\mathcal{O}(1/k)$.
+Replacing this with a stratified quasi-Monte~Carlo sampler---for example, a scrambled Halton or Sobol sequence with per-pixel Cranley--Patterson rotation---would reduce the discrepancy bound to $D_N^* = \mathcal{O}((\log N)^s / N)$, lowering the baseline variance $\sigma^2$ of the inner estimate without increasing $k$.
+Since the mollification width is proportional to $\sigma / \sqrt{k}$, halving $\sigma$ through better sampling is equivalent in boundary sharpness to quadrupling $k$, at no additional rendering cost.
+The \texttt{HaltonSampler} class implementing this strategy is available in \texttt{final\_project/stylized\_pt\_integrator.h}.
+
+\subsection{Polynomial Approximation Estimators}
+
+West~\cite{west2024stylized} (\S3.3) describes a class of estimators that replace the non-linear style function $g_\theta$ with a finite-degree polynomial approximation $\tilde{g}_m$ fitted in a Chebyshev basis.
+For the cel-shading step function, which approximates a Heaviside discontinuity, the polynomial estimator satisfies:
+\begin{equation}
+    \mathbb{E}\bigl[\tilde{g}_m\bigl(\langle I \rangle_k\bigr)\bigr] = \tilde{g}_m\bigl(\mathbb{E}[\langle I \rangle_k]\bigr) + \mathcal{O}\!\left(\frac{\sigma^{2m}}{k^m}\right)
+    \label{eq:cheby_bias}
+\end{equation}
+so the bias decays polynomially in $m$ rather than persisting at a fixed level as with direct application.
+Implementing this estimator requires precomputing the Chebyshev coefficients of $g_{\text{cel}}$ and evaluating the polynomial at render time via the Clenshaw recurrence, a modest $\mathcal{O}(m)$ per-pixel overhead.
+A degree-20 prototype (\texttt{eval\_cheby\_step} and \texttt{stylized\_apply\_cel\_chebyshev} in \texttt{final\_project/stylized\_pt\_integrator.h}) has been implemented; systematic evaluation of its bias-variance trade-off against direct application at matched $k$ is left as future work.
+
+\subsection{Differentiable Stylized Rendering}
+
+A longer-term direction is to integrate this stylized path tracer into a differentiable rendering framework such as Slang-D or Mitsuba~3~\cite{li2018differentiable}.
+The core computational challenge is computing derivatives of the recursive, non-linear expectation functions in West's algorithm: the gradient of the stylized output with respect to scene parameters must propagate through both the style function $g_\theta$ and the inner Monte~Carlo estimator $\langle I \rangle_k$.
+Differentiation through the inner-estimate requires either reparameterised path-space Monte~Carlo or dedicated edge-sampling procedures for visibility discontinuities, neither of which is trivially compatible with per-object style dispatch.
+Nevertheless, a differentiable extension would allow artists to optimise stylization parameters---cel thresholds, ACP colour ramps, tie-dye frequencies---directly from reference images or perceptual loss functions, removing the need for manual parameter tuning.
 
 
 %% ═══════════════════════════════════════════════════════════════
-%%  7. CONCLUSION
+%%  8. CONCLUSION
 %% ═══════════════════════════════════════════════════════════════
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have implemented and extended West's framework for stylized rendering as a function of expectation within the La~Jolla renderer. Our four-pipeline progression demonstrates the power of applying non-linear style functions to Monte~Carlo radiance estimates: the resulting images combine physically correct global illumination with artistically coherent stylization. The per-object dispatch mechanism and multi-style Sculpture Garden scene showcase the flexibility of this approach for complex, heterogeneous scenes. Code and scenes are available at \url{https://github.com/zhuyuezx/lajolla_public}.
+We have implemented and extended West's framework for stylized rendering as a function of expectation within the La~Jolla renderer~\cite{li2018differentiable}. Our four-pipeline progression---from image-space post-processing (Pipeline~1) through a real-time Deer Hunter~II viewer (Pipeline~2) and deterministic cel-shading (Pipeline~3) to Monte~Carlo multi-style dispatch (Pipeline~4)---demonstrates that applying non-linear style functions to physically based radiance estimates yields aesthetically coherent results with correct global illumination. The per-object dispatch mechanism bounds computational overhead to $\mathcal{O}(k)$ per styled pixel and makes animated sequences practical, while the multi-style Sculpture Garden scene demonstrates the flexibility of the approach for heterogeneous stylization. Code and scenes are available at \url{https://github.com/zhuyuezx/lajolla_public}.
 
 
 %% ═══════════════════════════════════════════════════════════════
@@ -429,7 +519,7 @@ We have implemented and extended West's framework for stylized rendering as a fu
 \label{app:pseudocode}
 
 \begin{algorithm}[h]
-\caption{Stylized Path Tracing with Per-Object Dispatch}
+\caption{Stylized Path Tracing with Per-Object Dispatch (Pipeline~4)}
 \label{alg:stylized_pt}
 \begin{algorithmic}[1]
 \REQUIRE Scene $\mathcal{S}$, ray $(o, d)$, params $\theta$
@@ -451,7 +541,79 @@ We have implemented and extended West's framework for stylized rendering as a fu
 \section{Scene Configuration (XML)}
 \label{app:xml}
 
-% TODO: Add example XML snippets showing per-object style assignment
+The Sculpture Garden scene (Pipeline~4) uses a custom XML format to specify the integrator, per-object style assignment, camera, and geometry. Below is an abridged version of the scene file:
+
+\begin{lstlisting}
+<scene version="0.4.0">
+  <!-- Stylized PT integrator with per-object dispatch -->
+  <integrator type="stylized_pt">
+    <integer name="maxDepth"      value="-1"/>
+    <integer name="inner_samples" value="256"/>
+    <float   name="transition_t"  value="1.0"/>
+
+    <!-- Per-object style assignment (by shape ID):
+         0: area light (not styled)  1: ground (not styled)
+         2: tall pedestal (cel)      3: sphere on tall (cel)
+         4: short pedestal (acp)     5: sphere on short (acp)
+         6: column (tiedye)          7: orb near column (tiedye)
+         8: floating orb (cel)       9: wide pedestal (acp) -->
+    <string name="cel_ids"    value="2,3,8"/>
+    <string name="tiedye_ids" value="6,7"/>
+    <string name="acp_ids"    value="4,5,9"/>
+
+    <!-- Style parameters -->
+    <float  name="cel_threshold"  value="0.10"/>
+    <color  name="cel_light_tint" value="0.85, 0.85, 0.75"/>
+    <color  name="cel_shadow_tint" value="0.25, 0.20, 0.35"/>
+    <color  name="cel_ambient"    value="0.12, 0.10, 0.15"/>
+    <float  name="tiedye_freq"    value="15.0"/>
+    <color  name="acp_dark"  value="0.06, 0.02, 0.18"/>
+    <color  name="acp_bright" value="1.0, 0.50, 0.15"/>
+  </integrator>
+
+  <sensor type="perspective">
+    <transform name="toWorld">
+      <lookAt origin="18, 12, 20"
+              target="0, 3, -2"
+              up="0, 1, 0"/>
+    </transform>
+    <float name="fov" value="45"/>
+    <film type="hdrfilm">
+      <integer name="width"  value="640"/>
+      <integer name="height" value="480"/>
+    </film>
+  </sensor>
+
+  <!-- Area light with animated position -->
+  <shape type="obj">
+    <string name="filename" value="meshes/light_quad.obj"/>
+    <translate x="0.0" y="55.0" z="10.0"/>
+    <emitter type="area">
+      <color name="radiance" value="120,120,120"/>
+    </emitter>
+  </shape>
+
+  <!-- Ground plane -->
+  <shape type="obj">
+    <string name="filename" value="meshes/ground.obj"/>
+    <bsdf type="diffuse">
+      <color name="reflectance" value="0.85,0.78,0.60"/>
+    </bsdf>
+  </shape>
+
+  <!-- Tall pedestal (shape 2, cel) -->
+  <shape type="obj">
+    <string name="filename" value="meshes/pedestal_tall.obj"/>
+    <bsdf type="diffuse">
+      <color name="reflectance" value="0.80,0.65,0.30"/>
+    </bsdf>
+  </shape>
+
+  <!-- ... additional shapes omitted for brevity ... -->
+</scene>
+\end{lstlisting}
+
+The \texttt{cel\_ids}, \texttt{tiedye\_ids}, and \texttt{acp\_ids} strings map shape indices to their respective style functions. Shapes not listed in any ID list receive standard PBR rendering. The animation script patches only the \texttt{<translate>} element of the area light for each frame (see Eq.~\ref{eq:light_sweep}).
 
 
 \end{document}

@@ -664,6 +664,12 @@ RenderOptions parse_integrator(pugi::xml_node node,
                 options.acp_dark_color = parse_vector3(child.attribute("value").value(), default_map);
             } else if (name == "acp_bright_color" || name == "acpBrightColor") {
                 options.acp_bright_color = parse_vector3(child.attribute("value").value(), default_map);
+            } else if (name == "use_halton" || name == "useHalton") {
+                std::string val = child.attribute("value").value();
+                options.use_halton_sampling = (val == "true" || val == "1");
+            } else if (name == "use_chebyshev" || name == "useChebyshev") {
+                std::string val = child.attribute("value").value();
+                options.use_chebyshev_cel = (val == "true" || val == "1");
             }
         }
     } else {

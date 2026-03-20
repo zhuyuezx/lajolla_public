@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.2.1)  19 MAR 2026 16:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.2.1)  19 MAR 2026 17:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -697,6 +697,17 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
+<../imgs/p1_viewer_front.png, id=107, 642.4pt x 481.8pt>
+File: ../imgs/p1_viewer_front.png Graphic file (type png)
+<use ../imgs/p1_viewer_front.png>
+Package pdftex.def Info: ../imgs/p1_viewer_front.png  used on input line 67.
+(pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
+<../imgs/p4_gallery_light060.png, id=108, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light060.png Graphic file (type png)
+<use ../imgs/p4_gallery_light060.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light060.png  used on input line 72
+.
+(pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
 
 
 [1
@@ -705,28 +716,28 @@ Package microtype Info: Loading generic protrusion settings for font family
 {/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdfte
 x/pdftex.map}]
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 122.
-
+[2 <../imgs/p1_viewer_front.png (PNG copy)> <../imgs/p4_gallery_light060.png>]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 122.
+(hyperref)                removing `math shift' on input line 137.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\theta' on input line 122.
+(hyperref)                removing `subscript' on input line 137.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 122.
+(hyperref)                removing `\theta' on input line 137.
 
 
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 137.
 
-[2]
+
 
 [3]
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 2
-05.
+20.
 
 (/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/tex/latex/ps
 nfss/ts1ptm.fd
@@ -734,41 +745,134 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 
 [4]
-Overfull \hbox (10.15358pt too wide) in paragraph at lines 302--303
- [][] 
- []
+<../imgs/p2_obra_dinn.png, id=192, 2509.375pt x 1138.2525pt>
+File: ../imgs/p2_obra_dinn.png Graphic file (type png)
+<use ../imgs/p2_obra_dinn.png>
+Package pdftex.def Info: ../imgs/p2_obra_dinn.png  used on input line 260.
+(pdftex.def)             Requested size: 190.79109pt x 86.52893pt.
+<../imgs/p2_toon.png, id=193, 963.6pt x 1284.8pt>
+File: ../imgs/p2_toon.png Graphic file (type png)
+<use ../imgs/p2_toon.png>
+Package pdftex.def Info: ../imgs/p2_toon.png  used on input line 265.
+(pdftex.def)             Requested size: 190.79109pt x 254.38727pt.
+<../imgs/p2_oil.png, id=194, 1712.3975pt x 1284.8pt>
+File: ../imgs/p2_oil.png Graphic file (type png)
+<use ../imgs/p2_oil.png>
+Package pdftex.def Info: ../imgs/p2_oil.png  used on input line 270.
+(pdftex.def)             Requested size: 190.79109pt x 143.13203pt.
+<../imgs/p2_painterly.png, id=195, 1712.3975pt x 1284.8pt>
+File: ../imgs/p2_painterly.png Graphic file (type png)
+<use ../imgs/p2_painterly.png>
+Package pdftex.def Info: ../imgs/p2_painterly.png  used on input line 275.
+(pdftex.def)             Requested size: 190.79109pt x 143.13203pt.
+<../imgs/p3_transition_t000.png, id=198, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t000.png Graphic file (type png)
+<use ../imgs/p3_transition_t000.png>
+Package pdftex.def Info: ../imgs/p3_transition_t000.png  used on input line 289
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t002.png, id=199, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t002.png Graphic file (type png)
+<use ../imgs/p3_transition_t002.png>
+Package pdftex.def Info: ../imgs/p3_transition_t002.png  used on input line 293
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t004.png, id=200, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t004.png Graphic file (type png)
+<use ../imgs/p3_transition_t004.png>
+Package pdftex.def Info: ../imgs/p3_transition_t004.png  used on input line 297
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t008.png, id=201, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t008.png Graphic file (type png)
+<use ../imgs/p3_transition_t008.png>
+Package pdftex.def Info: ../imgs/p3_transition_t008.png  used on input line 301
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t016.png, id=202, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t016.png Graphic file (type png)
+<use ../imgs/p3_transition_t016.png>
+Package pdftex.def Info: ../imgs/p3_transition_t016.png  used on input line 306
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t032.png, id=203, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t032.png Graphic file (type png)
+<use ../imgs/p3_transition_t032.png>
+Package pdftex.def Info: ../imgs/p3_transition_t032.png  used on input line 310
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t064.png, id=204, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t064.png Graphic file (type png)
+<use ../imgs/p3_transition_t064.png>
+Package pdftex.def Info: ../imgs/p3_transition_t064.png  used on input line 314
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
+<../imgs/p3_transition_t100.png, id=205, 642.4pt x 481.8pt>
+File: ../imgs/p3_transition_t100.png Graphic file (type png)
+<use ../imgs/p3_transition_t100.png>
+Package pdftex.def Info: ../imgs/p3_transition_t100.png  used on input line 318
+.
+(pdftex.def)             Requested size: 95.39857pt x 71.54642pt.
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+[5 <../imgs/p2_obra_dinn.png (PNG copy)> <../imgs/p2_toon.png (PNG copy)> <../i
+mgs/p2_oil.png (PNG copy)> <../imgs/p2_painterly.png (PNG copy)>]
+<../imgs/p4_gallery_light000.png, id=213, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light000.png Graphic file (type png)
+<use ../imgs/p4_gallery_light000.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light000.png  used on input line 33
+2.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+<../imgs/p4_gallery_light020.png, id=214, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light020.png Graphic file (type png)
+<use ../imgs/p4_gallery_light020.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light020.png  used on input line 33
+6.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+<../imgs/p4_gallery_light040.png, id=215, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light040.png Graphic file (type png)
+<use ../imgs/p4_gallery_light040.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light040.png  used on input line 34
+0.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+File: ../imgs/p4_gallery_light060.png Graphic file (type png)
+<use ../imgs/p4_gallery_light060.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light060.png  used on input line 34
+5.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+<../imgs/p4_gallery_light080.png, id=216, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light080.png Graphic file (type png)
+<use ../imgs/p4_gallery_light080.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light080.png  used on input line 34
+9.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+<../imgs/p4_gallery_light100.png, id=217, 642.4pt x 481.8pt>
+File: ../imgs/p4_gallery_light100.png Graphic file (type png)
+<use ../imgs/p4_gallery_light100.png>
+Package pdftex.def Info: ../imgs/p4_gallery_light100.png  used on input line 35
+3.
+(pdftex.def)             Requested size: 127.1981pt x 95.39522pt.
+File: ../imgs/p1_viewer_front.png Graphic file (type png)
+<use ../imgs/p1_viewer_front.png>
+Package pdftex.def Info: ../imgs/p1_viewer_front.png  used on input line 367.
+(pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
+<../imgs/p1_viewer_close.png, id=219, 642.4pt x 481.8pt>
+File: ../imgs/p1_viewer_close.png Graphic file (type png)
+<use ../imgs/p1_viewer_close.png>
+Package pdftex.def Info: ../imgs/p1_viewer_close.png  used on input line 372.
+(pdftex.def)             Requested size: 190.79109pt x 143.09283pt.
 
 
-Overfull \hbox (10.15358pt too wide) in paragraph at lines 317--318
- [][] 
- []
+[6 <../imgs/p3_transition_t000.png> <../imgs/p3_transition_t002.png> <../imgs/p
+3_transition_t004.png> <../imgs/p3_transition_t008.png> <../imgs/p3_transition_
+t016.png> <../imgs/p3_transition_t032.png> <../imgs/p3_transition_t064.png> <..
+/imgs/p3_transition_t100.png> <../imgs/p4_gallery_light000.png> <../imgs/p4_gal
+lery_light020.png> <../imgs/p4_gallery_light040.png> <../imgs/p4_gallery_light0
+80.png> <../imgs/p4_gallery_light100.png>] (CSE272_Jason_Zhu.bbl
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Overfull \hbox (10.15358pt too wide) in paragraph at lines 330--331
- [][] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
-[5]
-
-[6] (CSE272_Jason_Zhu.bbl
-
-[7])
+[7 <../imgs/p1_viewer_close.png (PNG copy)>])
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 408.
+put line 432.
 
 
 [8] (CSE272_Jason_Zhu.aux)
@@ -777,16 +881,16 @@ LaTeX2e <2024-11-01> patch level 1
 L3 programming layer <2024-12-25>
  ***********
 Package rerunfilecheck Info: File `CSE272_Jason_Zhu.out' has not changed.
-(rerunfilecheck)             Checksum: E5363CEA315855014967E603A2B75F24;5595.
+(rerunfilecheck)             Checksum: F336586FC7594BE965C0B452476CC98F;4356.
  ) 
 Here is how much of TeX's memory you used:
- 15677 strings out of 475472
- 254237 string characters out of 2764329
- 682032 words of memory out of 3000000
- 38126 multiletter control sequences out of 15000+600000
- 596830 words of font info for 204 fonts, out of 8000000 for 9000
+ 15843 strings out of 475472
+ 259651 string characters out of 2764329
+ 682337 words of memory out of 3000000
+ 38295 multiletter control sequences out of 15000+600000
+ 600720 words of font info for 219 fonts, out of 8000000 for 9000
  0 hyphenation exceptions out of 8191
- 75i,10n,79p,1134b,602s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 75i,10n,79p,1134b,609s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/
 dvips/base/8r.enc} </Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/d
 ata/fonts/pk/ljfour/jknappen/ec/dpi600/ectt1000.pk></Users/zhuyuezx/Library/App
@@ -796,19 +900,23 @@ b></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type
 KTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/zhuyuezx/
 Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/c
 m/cmmi7.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/
-fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/zhuyuezx/Library/Application S
-upport/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr5.pfb></Users/zh
-uyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/ams
-fonts/cm/cmr7.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/in
-stall/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/zhuyuezx/Library/Applic
-ation Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7.pfb></
-Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/ur
-w/times/utmb8a.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/i
-nstall/fonts/type1/urw/times/utmr8a.pfb></Users/zhuyuezx/Library/Application Su
-pport/MiKTeX/texmfs/install/fonts/type1/urw/times/utmri8a.pfb>
-Output written on CSE272_Jason_Zhu.pdf (8 pages, 231049 bytes).
+fonts/type1/public/amsfonts/cm/cmmi9.pfb></Users/zhuyuezx/Library/Application S
+upport/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/z
+huyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/am
+sfonts/cm/cmr5.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/i
+nstall/fonts/type1/public/amsfonts/cm/cmr7.pfb></Users/zhuyuezx/Library/Applica
+tion Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr9.pfb></Us
+ers/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/publ
+ic/amsfonts/cm/cmsy10.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/t
+exmfs/install/fonts/type1/public/amsfonts/cm/cmsy6.pfb></Users/zhuyuezx/Library
+/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7
+.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/texmfs/install/fonts/t
+ype1/urw/times/utmb8a.pfb></Users/zhuyuezx/Library/Application Support/MiKTeX/t
+exmfs/install/fonts/type1/urw/times/utmr8a.pfb></Users/zhuyuezx/Library/Applica
+tion Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmri8a.pfb>
+Output written on CSE272_Jason_Zhu.pdf (8 pages, 10575786 bytes).
 PDF statistics:
- 382 PDF objects out of 1000 (max. 8388607)
- 99 named destinations out of 1000 (max. 500000)
- 41729 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 380 PDF objects out of 1000 (max. 8388607)
+ 85 named destinations out of 1000 (max. 500000)
+ 43821 words of extra memory for PDF output out of 51595 (max. 10000000)
 

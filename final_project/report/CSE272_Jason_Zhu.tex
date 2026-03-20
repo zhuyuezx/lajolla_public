@@ -61,6 +61,21 @@ In this project, we implement and extend this framework within the La~Jolla rend
 
 Our primary contributions are: (a)~a clean implementation of West's stylization framework in La~Jolla, (b)~a per-object style dispatch mechanism enabling heterogeneous styles in a single render, and (c)~a custom open-air scene with animated lighting that demonstrates the interplay between physically based illumination and stylistic colour transformations.
 
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p1_viewer_front.png}
+        \caption{Deer Hunter II savanna scene (Pipeline~1)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light060.png}
+        \caption{Multi-style Sculpture Garden (Pipeline~4)}
+    \end{subfigure}
+    \caption{Two representative outputs of our system. \textbf{(a)}~Unlit flat-albedo rendering with cast ground shadows and distance fog, matching the Sokpop/Deer Hunter~II aesthetic. \textbf{(b)}~Monte Carlo--based multi-style scene combining cel-shading, tie-dye, and ACP style functions with physically correct global illumination.}
+    \label{fig:hero}
+\end{figure}
+
 
 %% ═══════════════════════════════════════════════════════════════
 %%  2. RELATED WORK
@@ -208,128 +223,157 @@ All pipelines are implemented within the La~Jolla physically-based renderer~\cit
     \item \texttt{parse\_scene.cpp}: XML parsing for \texttt{cel\_ids}, \texttt{tiedye\_ids}, \texttt{acp\_ids}, and associated parameters.
 \end{itemize}
 
-\subsection{Pipeline~1: Deterministic Cel-Shading}
+\paragraph{Post-processing baseline.}
+\label{sec:postproc}
+Before implementing Monte~Carlo stylisation (Pipelines~2--4), we developed a suite of 2D NPR post-processing techniques as a baseline. These operate on finished images and serve as a point of comparison for the 3D-integrated approach: (1)~Bayer ordered dithering in the style of \emph{Return of the Obra Dinn}~\cite{obradinn2018,floyd1976adaptive}, converting images to a two-colour palette; (2)~screen-space toon/cel quantisation that snaps luminance into $B$ discrete bands; (3)~Kuwahara-based painterly rendering~\cite{kuwahara1976processing} with optional Litwinowicz-style~\cite{litwinowicz1997processing} oriented brush strokes; and (4)~Sobel outline post-processing~\cite{saito1990comprehensible} using G-buffer--based 4-connected neighbour comparison on depth, normal, and object-ID AOV buffers.
 
-Pipeline~1 uses a single directional light and computes $\mathbf{N} \cdot \mathbf{L}$ with a hard shadow ray. A Sobel edge detection post-process on depth, normal, and object-ID AOVs produces outlines (see Section~\ref{sec:postproc}). This serves as our NPR baseline with zero Monte~Carlo noise.
+\subsection{Monte Carlo Stylization (Pipelines 2--4)}
 
-\subsection{Pipeline~2--3: Monte Carlo Stylization}
-
-Pipelines~2 and~3 use the $k$-sample inner trace (Eq.~\ref{eq:inner_trace}) with full path tracing: NEE, BSDF sampling, MIS, and Russian roulette. Pipeline~3 adds object-ID filtering (Eq.~\ref{eq:dispatch}) and the temporal crossfade (Eq.~\ref{eq:crossfade}).
-
-\subsection{Pipeline~4: Multi-Style Showcase}
-
-Pipeline~4 extends the dispatch to three simultaneous style functions and introduces a custom \emph{Sculpture Garden} scene (Section~\ref{sec:scene}) with animated lighting.
+Pipelines~2 and~3 use the $k$-sample inner trace (Eq.~\ref{eq:inner_trace}) with full path tracing: NEE, BSDF sampling, MIS, and Russian roulette. Pipeline~3 adds object-ID filtering (Eq.~\ref{eq:dispatch}) and the temporal crossfade (Eq.~\ref{eq:crossfade}). Pipeline~4 extends the dispatch to three simultaneous style functions in a custom \emph{Sculpture Garden} scene with animated lighting.
 
 \subsection{Sculpture Garden Scene}
 \label{sec:scene}
 
-To demonstrate the multi-style system beyond the Cornell Box, we designed a custom open-air scene with procedurally generated OBJ meshes:
+To demonstrate the multi-style system beyond the Cornell Box, we designed a custom open-air scene with procedurally generated OBJ meshes: a 60$\times$60 ground plane, three pedestal variants, a 32-sided cylindrical column, four spheres at various heights, and a large overhead area light positioned above the camera frustum.
 
-\begin{itemize}
-    \item A 60$\times$60 ground plane (warm sandy stone)
-    \item Three pedestal variants (tall, short, wide) for displaying objects
-    \item A 32-sided cylindrical column
-    \item Four spheres at various heights
-    \item A large overhead area light (positioned above the camera frustum to remain invisible)
-\end{itemize}
-
-Each shape is assigned a style: golden pedestals and sky-blue/pearl spheres receive \textbf{cel-shading}, the emerald column and lavender orb receive \textbf{tie-dye}, and terracotta/coral/slate objects receive \textbf{ACP}. The camera is fixed while the area light sweeps in a semicircular arc from left-grazing to overhead to right-grazing, demonstrating how each style responds differently to changing illumination geometry.
-
-\subsection{Animation Pipeline}
-
-The animation script (\texttt{animate\_gallery.py}) generates 60 frames by patching the area light's position in the scene XML (note: La~Jolla resolves OBJ mesh paths relative to the scene XML directory, so temporary frame XMLs must be written in the scene directory):
+Each shape is assigned a style: golden pedestals and sky-blue/pearl spheres receive \textbf{cel-shading}, the emerald column and lavender orb receive \textbf{tie-dye}, and terracotta/coral/slate objects receive \textbf{ACP}. The camera is fixed while the area light sweeps in a semicircular arc:
 \begin{equation}
     \mathbf{p}_{\text{light}}(i) = \begin{pmatrix} -R\cos(\pi i / (N-1)) \\ y_{\min} + (y_{\max} - y_{\min})\sin(\pi i / (N-1)) \\ z_0 \end{pmatrix}
     \label{eq:light_sweep}
 \end{equation}
-where $R$ is the sweep radius, $y_{\min}$ and $y_{\max}$ define the height range, and $N = 60$ frames. Frames are rendered in parallel, converted from EXR to PNG via \texttt{ffmpeg}, and assembled into an animated GIF using palette-based dithering for quality.
+where $R$ is the sweep radius, $y_{\min}$/$y_{\max}$ define the height range, and $N = 60$ frames.
 
 
 %% ═══════════════════════════════════════════════════════════════
-%%  5. NPR POST-PROCESSING
-%% ═══════════════════════════════════════════════════════════════
-\section{NPR Post-Processing Baseline}
-\label{sec:postproc}
-
-Before implementing Monte~Carlo stylisation (Pipelines~2--4), we developed a suite of 2D NPR post-processing techniques as a baseline. These operate on finished images and serve as a point of comparison for the 3D-integrated approach.
-
-\subsection{Ordered Dithering (Obra Dinn Style)}
-
-Inspired by \emph{Return of the Obra Dinn}~\cite{obradinn2018}, we convert any image to a two-colour palette via Bayer ordered dithering~\cite{floyd1976adaptive}. The algorithm: (1)~tone-map to LDR, (2)~extract luminance, (3)~threshold against a tiled $n \times n$ Bayer matrix ($n \in \{2,4\}$, yielding 4$\times$4 to 16$\times$16 patterns), and (4)~remap the binary mask to a chosen palette (sepia, green-phosphor, etc.). Optional Sobel edge enhancement before dithering preserves silhouettes.
-
-\subsection{Toon / Cel Quantisation}
-
-Screen-space cel shading quantises the luminance channel into $B$ discrete bands:
-\begin{equation}
-    L_{\text{cel}}(x) = \left\lfloor L(x) \cdot B \right\rfloor / B
-    \label{eq:cel_quant}
-\end{equation}
-where $L(x)$ is the pixel luminance. Steps: (1)~convert to HSL, (2)~snap lightness to $B$ levels, (3)~recompose HSL $\to$ RGB (preserving hue and saturation), (4)~detect edges via 4-connected luminance differences and paint them black. This is the image-space analogue of the 3D cel-shading in Pipeline~1.
-
-\subsection{Painterly Rendering}
-
-Three painting styles are built on the Kuwahara anisotropic smoothing filter~\cite{kuwahara1976processing}, which replaces each pixel with the mean of the lowest-variance quadrant in its neighbourhood, producing characteristic oil-paint blockiness. The \emph{Litwinowicz} variant~\cite{litwinowicz1997processing} additionally overlays oriented brush strokes along image-gradient directions. Colour palette reduction (uniform or $k$-means) limits the output to a target palette size.
-
-\subsection{Sobel Outline Post-Processing}
-\label{sec:sobel}
-
-For Pipeline~1, outline edges are extracted from three AOV buffers (depth, surface normal, object~ID) using a G-buffer--based approach~\cite{saito1990comprehensible}. Rather than a full Sobel convolution, we use direct 4-connected neighbour comparison:
-\begin{equation}
-    \text{edge}(x) = \bigl(|d_x - d_{\text{nbr}}| > \tau_d\bigr) \;\lor\; \bigl(\|\mathbf{n}_x - \mathbf{n}_{\text{nbr}}\| > \tau_n\bigr) \;\lor\; \bigl(\text{id}_x \neq \text{id}_{\text{nbr}}\bigr)
-    \label{eq:sobel}
-\end{equation}
-Silhouette pixels (geometry vs.\ background boundary) are always marked. A camera-facing normal flip ($\mathbf{N} \to -\mathbf{N}$ when $\mathbf{N} \cdot (-\mathbf{d}) < 0$) resolved a winding-order artifact on the Cornell Box ceiling, reducing outlined pixels by 35\%.
-
-
-%% ═══════════════════════════════════════════════════════════════
-%%  6. RESULTS
+%%  5. RESULTS
 %% ═══════════════════════════════════════════════════════════════
 \section{Results}
 \label{sec:results}
 
-% TODO: Add rendered images here. Suggested figures:
-% - Figure 1: Pipeline 1 vs Pipeline 2 comparison (deterministic vs MC cel-shading)
-% - Figure 2: Pipeline 3 temporal crossfade sequence (t=0, 0.33, 0.67, 1.0)
-% - Figure 3: Pipeline 4 Sculpture Garden — cel/tiedye/acp side by side
-% - Figure 4: Light sweep animation frames (left-grazing, overhead, right-grazing)
-% - Table 1: Rendering time comparison across pipelines and configurations
+\subsection{Post-Processing Baseline}
 
-\subsection{Visual Comparison}
+Figure~\ref{fig:postproc} shows representative outputs from the 2D NPR post-processing pipeline applied to personal photographs.
 
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=\linewidth]{figures/pipeline_comparison.png}
-    \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{14cm}{0cm}}
-    \caption{Comparison across pipelines. \textbf{Left}: Pipeline~1 (deterministic cel + Sobel outlines). \textbf{Centre}: Pipeline~2 (MC cel, $k = 256$). \textbf{Right}: Pipeline~4 (multi-style: cel sphere, tie-dye column, ACP pedestal). Pipeline~2--4 exhibit physically correct soft shadows and colour bleeding absent in Pipeline~1.}
-    \label{fig:comparison}
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p2_obra_dinn.png}
+        \caption{Obra Dinn 1-bit dithering}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p2_toon.png}
+        \caption{Toon shading (4 bands)}
+    \end{subfigure}
+    \vskip 0.3em
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p2_oil.png}
+        \caption{Kuwahara oil paint}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p2_painterly.png}
+        \caption{Litwinowicz brush strokes}
+    \end{subfigure}
+    \caption{Post-processing NPR baseline applied to UCSD campus photographs. These 2D image-space effects are blind to 3D geometry and illumination, motivating the Monte~Carlo--integrated approach in Pipelines~2--4.}
+    \label{fig:postproc}
 \end{figure}
 
-% TODO: Replace placeholder with actual rendered images
+\subsection{PBR-to-Cel Transition (Pipeline~3)}
 
-\subsection{Style Function Effects}
-
-% TODO: Add close-up renders showing each style function's effect on the same object
-% under different lighting conditions
+Figure~\ref{fig:transition} shows the temporal crossfade (Eq.~\ref{eq:crossfade}) at eight integration levels. At $t = 0$ the image is fully photorealistic; as $t$ increases, cel-shading progressively takes effect. The transition is most visible in the $t = 4\text{--}16\%$ range, beyond which the effect reaches visual saturation.
 
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=\linewidth]{figures/style_functions.png}
-    \fbox{\rule[-.5cm]{0cm}{3cm} \rule[-.5cm]{14cm}{0cm}}
-    \caption{Style function comparison on a sphere under identical lighting. \textbf{(a)}~PBR baseline. \textbf{(b)}~Cel-shading: hard lit/shadow boundary. \textbf{(c)}~Tie-dye: per-channel cosine waves produce psychedelic colour banding. \textbf{(d)}~ACP: luminance-to-gradient mapping (indigo $\to$ sunset orange).}
-    \label{fig:styles}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t000.png}
+        \caption{$t = 0\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t002.png}
+        \caption{$t = 2\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t004.png}
+        \caption{$t = 4\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t008.png}
+        \caption{$t = 8\%$}
+    \end{subfigure}
+    \vskip 0.3em
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t016.png}
+        \caption{$t = 16\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t032.png}
+        \caption{$t = 32\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t064.png}
+        \caption{$t = 64\%$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.24\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p3_transition_t100.png}
+        \caption{$t = 100\%$}
+    \end{subfigure}
+    \caption{PBR-to-cel transition sequence. The two coloured boxes (gold and blue) in the Cornell Box are the stylization targets. At low $t$ the scene is photorealistic with GI; at high $t$ the boxes exhibit hard cel-shading boundaries while retaining colour bleeding from the walls.}
+    \label{fig:transition}
 \end{figure}
 
-\subsection{Light Sweep Animation}
+\subsection{Multi-Style Light Sweep (Pipeline~4)}
 
-% TODO: Add key frames from the animated GIF showing the light sweeping
-% from left-grazing → overhead → right-grazing
+Figure~\ref{fig:light_sweep} shows six frames from the animated light sweep across the Sculpture Garden scene. As the area light moves from left-grazing to overhead to right-grazing, each style function responds differently: cel-shading boundaries shift, tie-dye bands modulate, and ACP gradients rotate along the colour ramp.
 
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=\linewidth]{figures/light_sweep.png}
-    \fbox{\rule[-.5cm]{0cm}{3cm} \rule[-.5cm]{14cm}{0cm}}
-    \caption{Selected frames from the light-sweep animation (60 frames, 15~fps). \textbf{Left}: Grazing illumination from the left ($i = 0$). \textbf{Centre}: Overhead lighting ($i = 30$). \textbf{Right}: Grazing from the right ($i = 60$). Each style reacts distinctly to the lighting change: cel boundaries shift, tie-dye bands modulate, and ACP gradients rotate along the colour ramp.}
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light000.png}
+        \caption{$0^\circ$ (left grazing)}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light020.png}
+        \caption{$36^\circ$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light040.png}
+        \caption{$72^\circ$}
+    \end{subfigure}
+    \vskip 0.3em
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light060.png}
+        \caption{$108^\circ$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light080.png}
+        \caption{$144^\circ$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p4_gallery_light100.png}
+        \caption{$180^\circ$ (right grazing)}
+    \end{subfigure}
+    \caption{Six frames from the light-sweep animation across the Sculpture Garden. Objects display cel-shading (left pedestal/sphere), tie-dye (column/top orb), and ACP (right pedestals/sphere). Shadows rotate and each style function reacts distinctly to the changing illumination.}
     \label{fig:light_sweep}
+\end{figure}
+
+\subsection{Deer Hunter II Viewer}
+
+Figure~\ref{fig:viewer} shows two angles from the real-time interactive Embree-based viewer, demonstrating the unlit flat-albedo rendering with cast ground shadows and linear distance fog---matching the Sokpop Collective / Deer Hunter~II aesthetic.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p1_viewer_front.png}
+        \caption{Default camera}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \includegraphics[width=\linewidth]{../imgs/p1_viewer_close.png}
+        \caption{Close-up view}
+    \end{subfigure}
+    \caption{Deer Hunter~II savanna scene rendered with our Embree-based interactive viewer. The procedural low-poly world features a player character, deer, crows, trees, ponds with reeds, and rocks---all rendered with unlit albedo, binary ground shadows, and linear distance fog fading to a warm sky.}
+    \label{fig:viewer}
 \end{figure}
 
 \subsection{Performance}
@@ -352,8 +396,6 @@ Silhouette pixels (geometry vs.\ background boundary) are always marked. A camer
 
 Pipeline~1 is effectively instantaneous due to its deterministic single-ray evaluation. Pipelines~2--3 scale linearly with $k$. Pipeline~4 uses higher $k$ (256) and SPP (16) for quality renders; non-target objects remain cheap (1-sample PBR fallback).
 
-% TODO: Add convergence analysis — how cel boundaries sharpen with increasing k
-
 
 %% ═══════════════════════════════════════════════════════════════
 %%  6. DISCUSSION & FUTURE WORK
@@ -361,25 +403,7 @@ Pipeline~1 is effectively instantaneous due to its deterministic single-ray eval
 \section{Discussion and Future Work}
 \label{sec:future}
 
-\paragraph{Convergence properties.}
-The super-linear convergence of the cel threshold is readily apparent: at $k = 16$ the shadow boundary is soft and noisy, while at $k = 256$ it is crisp and deterministic. This mollification effect, described in West~\cite{west2024stylized} \S3.2, is a direct consequence of applying $g_\theta$ to the averaged estimate rather than individual samples.
-
-\paragraph{Limitations.}
-Our implementation has several limitations:
-\begin{itemize}
-    \item The ACP colour ramp is limited to a two-stop linear gradient; a multi-stop or lookup-table-based mapping would provide richer palettes.
-    \item The tie-dye frequency/phase parameters are global; per-object parameterisation would allow more diverse effects.
-    \item Cross-hatching and other geometry-dependent styles (West~\cite{west2024stylized}, \S4) were attempted but abandoned due to shadow-ray self-intersection issues with procedural 3D hatching planes.
-\end{itemize}
-
-\paragraph{Future directions.}
-\begin{enumerate}
-    \item \textbf{Multi-stop ACP}: Extend the ACP ramp to $n$-stop colour gradients or artist-designed lookup textures.
-    \item \textbf{Procedural hatching}: Revisit cross-hatching using object-space parameterisation and tangent-frame alignment to avoid the planar projection artefacts encountered in our initial attempt.
-    \item \textbf{Temporal coherence}: Apply the style function to temporally smoothed radiance estimates for flicker-free animation.
-    \item \textbf{GPU acceleration}: Port the inner trace loop to CUDA/OptiX for interactive preview rates.
-    \item \textbf{Perceptual evaluation}: Conduct user studies to assess the aesthetic quality and 3D shape perception of different style functions under varying illumination.
-\end{enumerate}
+% TODO: Fill in discussion and future work
 
 
 %% ═══════════════════════════════════════════════════════════════
